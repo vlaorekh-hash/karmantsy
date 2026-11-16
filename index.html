@@ -825,7 +825,8 @@ function vHome() {
     <button class="btn ghost" data-act="album">Карман и альбом (${P.col.pocket.length})</button>
     <button class="btn ghost" data-act="heroes">Мои герои и голоса</button>
     ${U.toast ? `<div class="toast">${U.toast}</div>` : ''}
-    <p class="note">Для боя оба телефона должны быть в интернете. Надёжнее всего, если они в одной сети Wi-Fi.</p>`;
+    <p class="note">Для боя оба телефона должны быть в интернете. Надёжнее всего, если они в одной сети Wi-Fi.</p>
+    <button class="linkbtn" data-act="toreset">Начать игру заново</button>`;
 }
 function qrSvg(text) {
   try { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); } catch (e) { return ''; }
@@ -851,6 +852,16 @@ function vJoin() {
     <button class="btn ghost" data-act="cancel">Назад</button>`;
 }
 function vJoining() { return `${hdr('Соединяемся…', 'Код ' + esc(U.code))}<div class="patch"><p class="muted">Обычно это занимает пару секунд.</p></div><button class="btn ghost" data-act="cancel">Отмена</button>`; }
+function vReset() {
+  return `${hdr('Начать заново?', 'Новое яйцо, новые герои и новый стартовый набор.')}
+    <div class="patch stack">
+      <p>С этого телефона удалятся:</p>
+      <p class="muted">герои и их имена (${ROLES.map(r => esc(P.team[r.id].name)).join(', ')}), записанные голоса, карман (${P.col ? P.col.pocket.length : 0} карточек) и альбом.</p>
+      <p class="muted">На телефоне соперника ничего не изменится. Если хотите начать с нуля вдвоём, нажмите эту кнопку на обоих телефонах.</p>
+    </div>
+    <button class="btn" data-act="doreset" style="background:var(--hit);color:#fff;box-shadow:0 4px 0 #a33a2c">Да, разбить новое яйцо</button>
+    <button class="btn ghost" data-act="cancelreset">Отмена</button>`;
+}
 function vLost() { return `${hdr('Связь потеряна', 'Соперник вышел или пропал интернет.')}<button class="btn" data-act="cancel">На главную</button>`; }
 function oppName() { return OPP ? esc(OPP.name) : 'соперник'; }
 function vLobby() {
@@ -1030,7 +1041,7 @@ function vBanner() {
     <div>${creature(a)}${esc(a.name)}</div><span class="x">против</span><div>${creature(b)}${esc(b.name)}</div></div></div></button>`;
 }
 function render() {
-  const views = { stakes: vStakes, egg: vEgg, firstheroes: () => vHeroes(true), heroes: () => vHeroes(false), home: vHome, host: vHost, join: vJoin, joining: vJoining, lost: vLost, lobby: vLobby, intro: vIntro, duel: vDuel, result: vResult, album: vAlbum };
+  const views = { reset: vReset, stakes: vStakes, egg: vEgg, firstheroes: () => vHeroes(true), heroes: () => vHeroes(false), home: vHome, host: vHost, join: vJoin, joining: vJoining, lost: vLost, lobby: vLobby, intro: vIntro, duel: vDuel, result: vResult, album: vAlbum };
   const app = document.getElementById('app');
   const focus = document.activeElement && document.activeElement.id;
   app.innerHTML = (views[U.screen] || vHome)() + vBanner();
@@ -1067,6 +1078,14 @@ function act(t) {
       ROLES.forEach(r => { const c = P.team[r.id]; c.name = (c.name || '').trim() || r.name; });
       saveP(); U.screen = U.joinCode ? 'join' : 'home'; break;
     case 'heroes': U.screen = 'heroes'; break;
+    case 'toreset': U.toast = ''; U.screen = 'reset'; break;
+    case 'cancelreset': U.screen = 'home'; break;
+    case 'doreset':
+      closeNet(); G = null; OPP = null; OPPV = {}; BANNER = null; stopSpeech();
+      try { localStorage.removeItem('k2-profile'); localStorage.removeItem('k2-voices'); } catch (e) {}
+      P = null; VOICES = {}; U.taps = 0; U.joinCode = ''; U.screen = 'egg';
+      history.replaceState(null, '', location.pathname + location.search);
+      break;
     case 'rec': startRec(t.dataset.k); return;
     case 'recstop': if (U.rec) { try { U.rec.mr.stop(); } catch (e) {} } return;
     case 'hear': stopSpeech(); sayHero(true, t.dataset.k); return;
