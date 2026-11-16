@@ -577,6 +577,7 @@ function onData(m) {
     case 'prof': OPP = m.p; break;
     case 'lob': OLOB = m.l; if (isHost) maybeStart(); break;
     case 'game': G = m.g; onGame(); break;
+    case 'accept': if (isHost) acceptStake(them(), m.ok); return;
     case 'ready': if (isHost && G && G.phase === 'intro') { G.ready[them()] = true; maybeRound(); } return;
     case 'ans': if (isHost) judge(them(), m); return;
     case 'pick': if (isHost) rpsPick(them(), m.k); return;
@@ -594,9 +595,16 @@ function maybeStart() {
   if (LOB.rated && (!LOB.stake || !OLOB.stake)) return;
   const tri = LOB.pick === 'tri';
   G = { id: Date.now(), mode: LOB.pick, rated: LOB.rated, stake: LOB.rated ? { h: isHost ? LOB.stake : OLOB.stake, g: isHost ? OLOB.stake : LOB.stake } : null,
-    tri: tri ? { i: 0, score: { h: 0, g: 0 } } : null, role: tri ? TRI_ORDER[0] : LOB.pick, phase: 'intro', ready: { h: false, g: false },
+    tri: tri ? { i: 0, score: { h: 0, g: 0 } } : null, role: tri ? TRI_ORDER[0] : LOB.pick, phase: LOB.rated ? 'stakes' : 'intro', accept: { h: false, g: false }, ready: { h: false, g: false },
     round: 0, lives: { h: 3, g: 3 }, task: null, res: null, picks: null, end: null };
   LOB.ready = false; send({ t: 'lob', l: LOB });
+  bcast();
+}
+function acceptStake(side, ok) {
+  if (!G || G.phase !== 'stakes') return;
+  if (!ok) { G.phase = 'declined'; G.by = side; bcast(); return; }
+  G.accept[side] = true;
+  if (G.accept.h && G.accept.g) G.phase = 'intro';
   bcast();
 }
 function maybeRound() { if (G.ready.h && G.ready.g) newRound(); else bcast(); }
@@ -661,7 +669,9 @@ function onGame() {
   if (!fresh) { render(); return; }
   const prevPhase = lastSeen.id === G.id && lastSeen.role === G.role ? lastSeen.phase : '';
   lastSeen = { id: G.id, round: G.round, phase: G.phase, role: G.role };
-  if (G.phase === 'intro') { U.screen = 'intro'; U.ready = false; }
+  if (G.phase === 'stakes') { U.screen = 'stakes'; }
+  else if (G.phase === 'declined') { const by = G.by; G = null; U.screen = 'lobby'; U.toast = by === me() ? 'Ты отказался от ставок.' : 'Соперник отказался от ставок.'; LOB.ready = false; send({ t: 'lob', l: LOB }); render(); return; }
+  else if (G.phase === 'intro') { U.screen = 'intro'; U.ready = false; }
   else if (G.phase === 'play') { U.screen = 'duel'; U.input = ''; U.sent = false; U.myPick = null; startCount(); }
   else if (G.phase === 'res') { U.screen = 'duel'; clearTimeout(CT); stopSpeech(); U.count = 0; if (G.role === 'war' && G.res.why !== 'time') { U.shake = true; setTimeout(() => { U.shake = false; render(); }, 1200); } }
   else if (G.phase === 'end') { settle(); U.screen = 'result'; stopSpeech(); }
@@ -860,6 +870,7 @@ function vLobby() {
     <div class="stack" style="gap:8px">${OPTS.map(x => `<button class="opt ${LOB.pick === x.id ? 'on' : ''}" data-act="pick" data-id="${x.id}" aria-pressed="${LOB.pick === x.id}">
       ${x.id === 'tri' ? `<span class="mini">${ROLES.map(r => creature(P.team[r.id])).join('')}</span>` : creature(P.team[x.id])}
       <span class="stack" style="gap:2px"><b>${x.name}</b><span class="muted">${x.rule}</span></span>${o.pick === x.id ? '<span class="tag" style="margin-left:auto">соперник</span>' : ''}</button>`).join('')}</div>
+    ${U.toast && U.screen === 'lobby' ? `<div class="toast">${U.toast}</div>` : ''}
     <div class="patch stack">${status}</div>
     <div class="patch stack">
       <div class="chips"><button class="chip ${LOB.rated ? '' : 'on'}" data-act="rated" data-on="0" aria-pressed="${!LOB.rated}">Тренировка</button><button class="chip ${LOB.rated ? 'on' : ''}" data-act="rated" data-on="1" aria-pressed="${LOB.rated}">На вкладыш</button></div>
@@ -902,6 +913,22 @@ function vIntro() {
     <button class="btn" data-act="introready" ${U.ready ? 'disabled' : ''}>${U.ready ? 'Ждём соперника…' : 'Готов!'}</button>
     ${G.ready[them()] ? `<p class="note">${oppName()} готов</p>` : ''}
     ${triNote()}`;
+}
+function vStakes() {
+  const mine = G.stake[me()], theirs = G.stake[them()], acc = G.accept[me()], oacc = G.accept[them()];
+  const need = !isGlued(theirs) && !P.col.pocket.includes(theirs);
+  return `<h1>Ставки сделаны</h1>
+    <p class="muted">${OPTS.find(x => x.id === G.mode).name}. Победитель забирает ставку соперника.</p>
+    <div class="patch stack">
+      <div class="big-cards">
+        <div>${mc(mine, { big: true })}<b>Твоя ставка</b><span class="muted">${esc(P.name)}</span></div>
+        <div>${mc(theirs, { big: true })}<b>Ставка соперника</b><span class="muted">${oppName()}</span></div>
+      </div>
+      <p style="text-align:center">${need ? '<b class="thread">Такой карточки у тебя ещё нет!</b> Выиграй её для альбома.' : 'Такая карточка у тебя уже есть: это будет повторка.'}</p>
+    </div>
+    <button class="btn" data-act="accept" ${acc ? 'disabled' : ''}>${acc ? 'Ждём соперника…' : 'Принимаю, в бой!'}</button>
+    <p class="note">${oacc ? oppName() + ' принял ставки' : oppName() + ' смотрит на ставки'}</p>
+    ${acc ? '' : '<button class="btn ghost" data-act="decline">Передумал, назад</button>'}`;
 }
 function check() { return `<div class="winfx"><svg class="chk" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/><path d="M28 52 L44 67 L73 35"/></svg>${winFx()}</div>`; }
 function vDuel() {
@@ -1003,7 +1030,7 @@ function vBanner() {
     <div>${creature(a)}${esc(a.name)}</div><span class="x">против</span><div>${creature(b)}${esc(b.name)}</div></div></div></button>`;
 }
 function render() {
-  const views = { egg: vEgg, firstheroes: () => vHeroes(true), heroes: () => vHeroes(false), home: vHome, host: vHost, join: vJoin, joining: vJoining, lost: vLost, lobby: vLobby, intro: vIntro, duel: vDuel, result: vResult, album: vAlbum };
+  const views = { stakes: vStakes, egg: vEgg, firstheroes: () => vHeroes(true), heroes: () => vHeroes(false), home: vHome, host: vHost, join: vJoin, joining: vJoining, lost: vLost, lobby: vLobby, intro: vIntro, duel: vDuel, result: vResult, album: vAlbum };
   const app = document.getElementById('app');
   const focus = document.activeElement && document.activeElement.id;
   app.innerHTML = (views[U.screen] || vHome)() + vBanner();
@@ -1053,7 +1080,7 @@ function act(t) {
     case 'glue': if (U.sel) glue(U.sel); break;
     case 'gum': { const got = [pick(commons()), pick(commons()), pick(commons())]; P.col.pocket.push(...got); U.toast = 'Получено: ' + got.map(id => '«' + CARDS[id].name + '»').join(', ') + '.'; U.sel = null; saveP(); if (conn) send({ t: 'prof', p: summary() }); break; }
     case 'colreset': P.col = newCol(P.starter || 'd'); U.sel = null; U.toast = 'Коллекция начата заново: стартовый набор в кармане.'; saveP(); break;
-    case 'pick': LOB.pick = t.dataset.id; LOB.ready = false; pushLob(); return;
+    case 'pick': U.toast = ''; LOB.pick = t.dataset.id; LOB.ready = false; pushLob(); return;
     case 'rated': LOB.rated = t.dataset.on === '1'; LOB.ready = false; if (!LOB.rated) LOB.stake = null; pushLob(); return;
     case 'stake': LOB.stake = t.dataset.id; LOB.ready = false; pushLob(); return;
     case 'ready': LOB.ready = !LOB.ready; pushLob(); return;
@@ -1065,6 +1092,8 @@ function act(t) {
       if (U.ready) return; U.ready = true; announce(G.role);
       if (isHost) { G.ready.h = true; maybeRound(); } else send({ t: 'ready' });
       break;
+    case 'accept': if (isHost) acceptStake('h', true); else { G.accept.g = true; send({ t: 'accept', ok: true }); } break;
+    case 'decline': if (isHost) acceptStake('h', false); else send({ t: 'accept', ok: false }); return;
     case 'banner': BANNER = null; break;
     case 'key': key(t.dataset.k); return;
     case 'bksp': key('bksp'); return;
