@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Кабинет карточек</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout idea: one phone-width column sewn like a jeans pocket; orange thread marks everything you can touch, copper rivets are lives */
+  --denim: #24457a;
+  --denim-deep: #172d52;
+  --denim-light: #3a62a3;
+  --thread: #f2a93b;
+  --paper: #f5ecd6;
+  --ink: #14213a;
+  --rivet: #d9824a;
+  --hit: #ff6b57;
+  --safe: #8fe0b4;
+  --font-display: "Dela Gothic One", "Arial Black", Impact, sans-serif;
+  --font-body: "Golos Text", "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background-color: var(--denim-deep);
+  background-image:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(25deg, rgba(0,0,0,.06) 0 1px, transparent 1px 4px);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+}
+#app {
+  max-width: 430px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+h1, h2 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.15; }
+h1 { font-size: 30px; letter-spacing: .01em; }
+h2 { font-size: 20px; }
+p { margin: 0; }
+.muted { opacity: .75; font-size: 14px; }
+.thread { color: var(--thread); }
+
+.patch {
+  background: var(--denim);
+  border: 2px dashed var(--thread);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 0 0 4px var(--denim), 0 6px 0 4px rgba(0,0,0,.25);
+  margin: 4px;
+}
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.between { justify-content: space-between; }
+.center { align-items: center; text-align: center; }
+
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
+.btn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  background: var(--thread);
+  color: var(--ink);
+  border: 0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  width: 100%;
+  box-shadow: 0 4px 0 #a86a12;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #a86a12; }
+.btn[disabled] { background: #6f7f9c; color: #1d2c49; box-shadow: 0 4px 0 #4a5874; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--paper); border: 2px dashed var(--paper); box-shadow: none; font-family: var(--font-body); font-weight: 500; font-size: 16px; padding: 11px 18px; }
+
+input[type=text] {
+  font: inherit; font-weight: 500; font-size: 18px;
+  width: 100%; padding: 12px;
+  border-radius: 8px; border: 2px solid var(--denim-light);
+  background: var(--denim-deep); color: var(--paper);
+}
+label { font-size: 14px; opacity: .8; }
+
+/* fighters */
+.fighter { display: flex; align-items: center; gap: 10px; }
+.fighter svg { width: 64px; height: 64px; flex: none; }
+.fighter .who { font-weight: 700; }
+.rivets { display: flex; gap: 5px; }
+.rivet { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f6c79d, var(--rivet) 55%, #8a4a22); box-shadow: 0 1px 0 rgba(0,0,0,.4); }
+.rivet.lost { background: transparent; border: 2px solid rgba(245,236,214,.35); box-shadow: none; }
+.tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--safe); color: var(--ink); }
+.vs { font-family: var(--font-display); font-size: 14px; opacity: .6; text-align: center; }
+
+/* planning grid */
+.plan { display: grid; grid-template-columns: 58px 1fr 1fr; gap: 8px 8px; align-items: center; }
+.plan .head { font-size: 13px; font-weight: 700; text-align: center; }
+.plan .zone { font-weight: 700; font-size: 14px; }
+.cell { display: flex; align-items: center; justify-content: space-between; background: var(--denim-deep); border-radius: 8px; padding: 4px; min-height: 44px; }
+.cell.shielded { justify-content: center; background: var(--safe); color: var(--ink); font-weight: 700; font-size: 14px; }
+.step { width: 34px; height: 34px; border-radius: 6px; border: 0; background: var(--denim-light); color: var(--paper); font-size: 20px; font-weight: 700; line-height: 1; }
+.step[disabled] { opacity: .3; cursor: not-allowed; }
+.pips { display: flex; gap: 4px; }
+.pip { width: 11px; height: 11px; border-radius: 50%; border: 2px solid rgba(245,236,214,.4); }
+.pip.atk.on { background: var(--hit); border-color: var(--hit); }
+.pip.blk.on { background: var(--paper); border-color: var(--paper); }
+.left { font-variant-numeric: tabular-nums; }
+.shieldpick { display: flex; gap: 8px; }
+.chip { flex: 1; padding: 9px 4px; border-radius: 8px; border: 2px dashed var(--safe); background: transparent; font-weight: 700; font-size: 14px; }
+.chip.on { background: var(--safe); color: var(--ink); border-style: solid; }
+
+/* reveal */
+.reveal { display: grid; grid-template-columns: 58px 1fr 1fr; gap: 6px 8px; align-items: center; font-variant-numeric: tabular-nums; }
+.reveal .head { font-size: 13px; font-weight: 700; text-align: center; }
+.res { background: var(--denim-deep); border-radius: 8px; padding: 8px 6px; text-align: center; font-size: 14px; }
+.res b { font-size: 16px; }
+.res.dmg b { color: var(--hit); }
+.res.zero b { color: var(--safe); }
+.total { font-family: var(--font-display); font-size: 16px; text-align: center; }
+
+/* step-by-step reveal */
+.stage { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; width: 100%; background: none; border: 0; padding: 0; color: inherit; }
+.stage .dir { font-size: 14px; font-weight: 700; opacity: .85; }
+.stage .zn { font-family: var(--font-display); font-size: 34px; line-height: 1; }
+.clash { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; width: 100%; }
+.side { background: var(--denim-deep); border-radius: 10px; padding: 12px 6px; min-height: 86px; display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; }
+.side .cap { font-size: 12px; font-weight: 700; opacity: .75; text-transform: uppercase; letter-spacing: .06em; }
+.dots { display: flex; gap: 7px; min-height: 22px; align-items: center; }
+.dot { width: 22px; height: 22px; border-radius: 50%; }
+.dot.a { background: var(--hit); }
+.dot.b { background: var(--paper); border-radius: 5px; }
+.dot.a { animation: fly .35s cubic-bezier(.2,1.4,.4,1) both; }
+.dot.a:nth-child(2) { animation-delay: .12s; } .dot.a:nth-child(3) { animation-delay: .24s; }
+.qm { font-family: var(--font-display); font-size: 30px; animation: pulse .7s ease-in-out infinite alternate; }
+.side.shieldbox { background: var(--safe); color: var(--ink); }
+.side.shieldbox .big { font-family: var(--font-display); font-size: 22px; }
+.arrow { font-family: var(--font-display); font-size: 22px; color: var(--thread); }
+.verdict { font-family: var(--font-display); font-size: 30px; min-height: 40px; line-height: 1.1; }
+.verdict.dmg { color: var(--hit); animation: slam .4s cubic-bezier(.2,1.6,.4,1) both; }
+.verdict.zero { color: var(--safe); animation: pop .4s cubic-bezier(.2,1.6,.4,1) both; }
+.verdict.wait { opacity: .35; font-size: 18px; font-family: var(--font-body); }
+.flip { animation: flip .3s ease both; }
+.progress { display: flex; gap: 6px; justify-content: center; }
+.progress i { width: 22px; height: 5px; border-radius: 3px; background: rgba(245,236,214,.25); }
+.progress i.done { background: var(--thread); }
+.shake { animation: shake .45s ease; }
+.rivet.just { animation: drop .5s ease both; }
+.linkbtn { background: none; border: 0; text-decoration: underline; font-size: 14px; opacity: .8; padding: 8px; align-self: center; }
+@keyframes fly { from { transform: translateX(-40px) scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pulse { from { opacity: .4; } to { opacity: 1; } }
+@keyframes slam { 0% { transform: scale(2.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes flip { from { transform: rotateY(90deg); } to { transform: none; } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+@keyframes drop { 0% { transform: scale(1.6); background: var(--hit); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .dot.a, .qm, .verdict.dmg, .verdict.zero, .flip, .shake, .rivet.just { animation: none; } }
+
+/* arena: two fighters face to face */
+.head2 { display: flex; flex-direction: column; gap: 5px; }
+.head2.bot { align-items: flex-end; text-align: right; }
+.arena { display: grid; grid-template-columns: 84px 46px 1fr 46px 84px; grid-template-rows: repeat(3, 40px); gap: 6px; align-items: stretch; }
+.cr { grid-row: 1 / 4; display: flex; align-items: center; }
+.cr.l { grid-column: 1; } .cr.r { grid-column: 5; }
+.cr svg { width: 84px; height: 84px; }
+.slot { display: flex; align-items: center; justify-content: center; gap: 4px; background: var(--denim-deep); border-radius: 8px; font-weight: 700; font-size: 12px; border: 2px solid transparent; }
+.slot.me { grid-column: 2; } .slot.bot { grid-column: 4; }
+.slot .dot { width: 13px; height: 13px; border-radius: 3px; }
+.slot .q { font-family: var(--font-display); font-size: 18px; opacity: .5; }
+.slot .none { opacity: .45; font-weight: 500; }
+.slot.sh { background: var(--safe); color: var(--ink); }
+.slot.active { border-color: var(--thread); }
+.slot.bad { border-color: var(--hit); background: #6b2a33; }
+.slot.good { border-color: var(--safe); }
+.lane { grid-column: 3; display: flex; align-items: center; justify-content: center; border-bottom: 2px dashed rgba(245,236,214,.15); }
+.lane .zl { font-size: 12px; font-weight: 700; opacity: .4; text-transform: uppercase; letter-spacing: .06em; }
+.lane.cur .zl { opacity: 1; color: var(--thread); }
+.lane.ltr { justify-content: flex-end; } .lane.rtl { justify-content: flex-start; }
+.lane .dots { gap: 4px; }
+.lane .dot { width: 16px; height: 16px; }
+.lane.ltr .dot.a { animation-name: flyR; } .lane.rtl .dot.a { animation-name: flyL; }
+@keyframes flyR { from { transform: translateX(-90px) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes flyL { from { transform: translateX(90px) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* pockets */
+.pockets { display: flex; gap: 10px; }
+.pocket { flex: 1; background: none; border: 0; padding: 0; position: relative; }
+.pocket svg { width: 100%; height: auto; display: block; }
+.pocket .lbl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; padding-bottom: 14%; }
+.pocket.on svg .body { fill: var(--thread); }
+.pocket.on .lbl { color: var(--ink); }
+.pocket.sewn { opacity: .35; cursor: not-allowed; }
+
+/* team, lobby */
+.trio { display: flex; align-items: center; gap: 12px; }
+.trio svg { width: 72px; height: 72px; flex: none; }
+.opt { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; background: var(--denim); border: 2px solid var(--denim-light); border-radius: 10px; padding: 8px 12px; }
+.opt svg { width: 54px; height: 54px; flex: none; }
+.opt .mini { display: flex; width: 54px; flex: none; justify-content: center; }
+.opt .mini svg { width: 24px; height: 24px; margin: 0 -3px; }
+.opt.on { border-color: var(--thread); background: var(--denim-light); box-shadow: 0 0 0 2px var(--thread); }
+.opt b { font-size: 17px; }
+
+/* speed duels */
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.qside { display: flex; align-items: center; gap: 8px; }
+.qside svg { width: 52px; height: 52px; flex: none; }
+.qside.bot { flex-direction: row-reverse; text-align: right; }
+.qside.bot .rivets { justify-content: flex-end; }
+.count { font-family: var(--font-display); font-size: 96px; line-height: 1; text-align: center; color: var(--thread); padding: 20px 0; }
+.task { font-family: var(--font-display); font-size: 34px; text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
+.task .ans { color: var(--thread); border-bottom: 3px dashed var(--thread); padding: 0 6px; min-width: 1.2em; display: inline-block; }
+.task.word { font-size: 28px; letter-spacing: .04em; min-height: 44px; }
+.mask { font-family: var(--font-display); font-size: 26px; letter-spacing: .12em; text-align: center; }
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.key { height: 54px; border: 0; border-radius: 8px; background: var(--denim-light); color: var(--paper); font-size: 22px; font-weight: 700; box-shadow: 0 3px 0 rgba(0,0,0,.3); }
+.key:active { transform: translateY(2px); box-shadow: none; }
+.key.ok { background: var(--thread); color: var(--ink); }
+.kb { display: flex; flex-direction: column; gap: 5px; margin: 0 -12px; }
+.kb .krow { display: flex; gap: 3px; justify-content: center; }
+.kb .key { flex: 1 1 0; min-width: 0; max-width: 34px; height: 46px; font-size: 17px; padding: 0; text-transform: uppercase; }
+.kb .key.wide { max-width: 56px; flex: 1.8 1 0; font-size: 15px; }
+.chips { display: flex; gap: 8px; }
+.chips .chip { border-color: var(--thread); }
+.chips .chip.on { background: var(--thread); }
+.chips .chip[disabled] { opacity: .4; cursor: not-allowed; }
+
+/* collection cards */
+.mc { position: relative; width: 100%; aspect-ratio: 22 / 32; box-sizing: border-box; background: var(--paper); color: var(--ink); border-radius: 7px; padding: 5px; display: flex; flex-direction: column; gap: 4px; border: 2px solid transparent; box-shadow: 0 3px 0 rgba(0,0,0,.3); font: inherit; text-align: left; }
+.mc .top { display: flex; justify-content: space-between; color: #fff; border-radius: 4px; padding: 2px 5px; font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.mc .art { background: #fff; border-radius: 4px; flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.mc .art svg { width: 100%; height: 100%; }
+.mc .nm { font-family: var(--font-display); font-size: 10px; line-height: 1.1; min-height: 2.2em; }
+.mc.big .top { font-size: 11px; padding: 4px 7px; } .mc.big .nm { font-size: 14px; min-height: 0; } .mc.big .fact { font-size: 11px; line-height: 1.3; }
+.mc.s-d .top { background: #2f7a4a; } .mc.s-c .top { background: #b4531a; } .mc.s-f .top { background: #2459b3; }
+.mc.rare { border-color: #c9971c; box-shadow: 0 0 0 2px #f2d27a, 0 3px 0 rgba(0,0,0,.3); }
+.mc.rare .top { background: #c9971c; color: var(--ink); } .mc.rare .art { background: #fff8e1; }
+.mc.ultra { background: #1b1530; color: var(--paper); border-color: #b58df1; box-shadow: 0 0 0 2px #f2d27a, 0 0 14px rgba(181,141,241,.6); }
+.mc.ultra .top { background: #b58df1; color: var(--ink); } .mc.ultra .art { background: #2a2148; }
+.mc.limited { background: var(--ink); color: #f2d27a; border-color: #f2d27a; }
+.mc.limited .top { background: var(--ink); color: #f2d27a; border: 1px solid #f2d27a; } .mc.limited .art { background: #1d2e52; }
+.mc .cnt { position: absolute; top: -7px; right: -7px; background: var(--thread); color: var(--ink); font-weight: 700; font-size: 12px; border-radius: 99px; padding: 1px 7px; }
+.mc .glued { position: absolute; left: 50%; bottom: 34%; transform: translateX(-50%) rotate(-8deg); background: var(--safe); color: var(--ink); font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+button.mc { cursor: pointer; }
+.mc:not(.big) .top { justify-content: center; }
+.mc:not(.big) .top span:first-child { display: none; }
+.grid5 .mc { padding: 3px; gap: 3px; } .grid5 .mc .top { font-size: 8px; padding: 1px 2px; } .grid5 .mc .nm { font-size: 8px; min-height: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+button.mc.sel { outline: 3px solid var(--thread); outline-offset: 2px; }
+.slot-empty { width: 100%; aspect-ratio: 22 / 32; border: 2px dashed rgba(245,236,214,.35); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; opacity: .55; box-sizing: border-box; text-align: center; }
+.slot-empty.small { font-family: var(--font-body); font-size: 10px; font-weight: 700; padding: 4px; }
+.grid5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 10px; }
+.serhead { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; }
+.toast { background: var(--safe); color: var(--ink); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
+.bar { position: sticky; bottom: 8px; display: flex; flex-direction: column; gap: 8px; background: var(--denim-deep); border: 2px solid var(--thread); border-radius: 12px; padding: 10px; }
+.hscroll { display: flex; gap: 10px; overflow-x: auto; padding: 8px 4px 10px; }
+.hscroll .mc { width: 84px; flex: none; }
+.big-cards { display: flex; gap: 14px; justify-content: center; }
+.big-cards > div { width: 140px; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+.big-cards .mc.gone { opacity: .45; filter: grayscale(1); }
+
+/* two players, one phone */
+.cover { display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; }
+.cover svg { width: 130px; height: 130px; }
+.names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.duo { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; position: fixed; inset: 0; z-index: 5; background-color: var(--denim-deep); display: grid; grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr); }
+.half { display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; padding: 10px 12px; min-height: 0; overflow: hidden; }
+.half.top { transform: rotate(180deg); }
+.half .hhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.half .hhead .row { gap: 6px; }
+.half .hhead svg { width: 40px; height: 40px; }
+.half .count { font-size: 64px; padding: 0; }
+.half .task { font-size: 30px; }
+.half .task.word { font-size: 24px; min-height: 0; }
+.half .mask { font-size: 22px; }
+.half .msg { text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.half .msg .verdict { font-size: 26px; min-height: 0; }
+.numpad.sm { gap: 6px; } .numpad.sm .key { height: 44px; font-size: 20px; }
+.half .kb { margin: 0 -8px; } .half .kb .key { height: 40px; }
+.mid { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 12px; background: var(--denim); border-block: 2px dashed var(--thread); }
+.mid .btn { width: auto; padding: 10px 16px; font-size: 16px; }
+.mid .linkbtn { padding: 6px; }
+
+/* duo setup, voices, win effects */
+.half.setup { justify-content: flex-start; gap: 8px; }
+.half .egg-sm { background: none; border: 0; padding: 0; width: 120px; align-self: center; }
+.half .egg-sm svg { width: 100%; height: auto; display: block; }
+.hero { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto; gap: 6px; align-items: center; }
+.hero svg { width: 44px; height: 44px; }
+.hero input { font-size: 15px; padding: 8px; }
+.hero .rl { font-size: 11px; opacity: .7; grid-column: 2 / 5; margin-bottom: -4px; }
+.ibtn { width: 40px; height: 40px; border-radius: 8px; border: 2px solid var(--thread); background: transparent; color: var(--paper); display: flex; align-items: center; justify-content: center; padding: 0; position: relative; }
+.ibtn svg { width: 20px; height: 20px; }
+.ibtn.has { background: var(--thread); color: var(--ink); }
+.ibtn.rec { background: var(--hit); border-color: var(--hit); color: #fff; font-weight: 700; font-size: 15px; }
+.ibtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.pname { display: flex; gap: 8px; align-items: center; } .pname label { white-space: nowrap; }
+.pname input { font-size: 15px; padding: 8px; }
+.okbadge { background: var(--safe); color: var(--ink); font-weight: 700; border-radius: 8px; padding: 10px; text-align: center; }
+.vsbanner { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(15, 26, 48, .95); }
+.vsbanner .in { display: flex; flex-direction: column; align-items: center; gap: 6px; animation: pop .45s cubic-bezier(.2,1.6,.4,1) both; }
+.vsbanner .pair { display: flex; align-items: center; gap: 14px; }
+.vsbanner .pair > div { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--font-display); font-size: 22px; text-align: center; max-width: 140px; overflow-wrap: anywhere; }
+.vsbanner svg { width: 110px; height: 110px; }
+.vsbanner .x { font-family: var(--font-display); font-size: 26px; color: var(--thread); }
+.vsbanner .top { transform: rotate(180deg); }
+.half { position: relative; }
+.winfx { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 3; }
+.winfx .chk { width: 150px; height: 150px; animation: winpop 2.2s ease forwards; }
+.winfx .chk circle { fill: #2fb36b; }
+.winfx .chk path { fill: none; stroke: #fff; stroke-width: 14; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 120; stroke-dashoffset: 120; animation: draw .45s .2s ease forwards; }
+.spark { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 3px; animation: burst 1.3s ease-out forwards; }
+@keyframes winpop { 0% { transform: scale(.2); opacity: 0; } 15% { transform: scale(1.15); opacity: 1; } 25% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: scale(1); } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes burst { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)) scale(.6); opacity: 0; } }
+.fwrap { position: relative; display: flex; justify-content: center; }
+.fwrap .spark { animation-iteration-count: 3; }
+@media (prefers-reduced-motion: reduce) { .winfx .chk, .winfx .chk path, .spark, .vsbanner .in { animation: none; } .winfx .chk path { stroke-dashoffset: 0; } .spark { display: none; } }
+
+/* rock paper scissors */
+.rps-picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.rps-btn { background: var(--denim); border: 2px solid var(--denim-light); border-radius: 12px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 700; font-size: 14px; }
+.rps-btn svg { width: 64px; height: 64px; }
+.rps-btn:active { border-color: var(--thread); }
+.rps-big { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.rps-big svg { width: 120px; height: 120px; }
+.shake svg.fist { animation: fist .45s ease-in-out 3; transform-origin: 50% 90%; }
+.reveal-pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes fist { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-22px) rotate(-8deg); } }
+@media (prefers-reduced-motion: reduce) { .shake svg.fist, .reveal-pop { animation: none; } }
+
+/* вкладыш */
+.inserts { display: flex; gap: 12px; justify-content: center; }
+.insert { width: 132px; background: var(--paper); color: var(--ink); border-radius: 4px; padding: 8px; transform: rotate(-3deg); box-shadow: 0 5px 0 rgba(0,0,0,.3); display: flex; flex-direction: column; gap: 4px; }
+.insert:nth-child(2) { transform: rotate(4deg); }
+.insert.gone { opacity: .45; filter: grayscale(1); }
+.insert .series { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; display: flex; justify-content: space-between; }
+.insert .art { background: #e3d5b0; border-radius: 3px; height: 74px; display: flex; align-items: center; justify-content: center; }
+.insert .art svg { height: 56px; }
+.insert .nm { font-family: var(--font-display); font-size: 13px; line-height: 1.15; }
+.insert .own { font-size: 11px; opacity: .7; }
+
+/* egg */
+.eggbtn { background: none; border: 0; padding: 0; width: 190px; align-self: center; }
+.eggbtn svg { width: 100%; height: auto; display: block; }
+.wobble { animation: wobble .35s ease; }
+.pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1); }
+@keyframes wobble { 0%{transform:rotate(0)} 25%{transform:rotate(-7deg)} 60%{transform:rotate(6deg)} 100%{transform:rotate(0)} }
+@keyframes pop { 0%{transform:scale(.6)} 100%{transform:scale(1)} }
+@media (prefers-reduced-motion: reduce) { .wobble, .pop { animation: none; } }
+.newborn { width: 170px; height: 170px; align-self: center; }
+.note { font-size: 13px; opacity: .7; text-align: center; }
+
+html, body { overscroll-behavior: none; }
+body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+.code { font-family: var(--font-display); font-size: 56px; letter-spacing: .15em; color: var(--thread); line-height: 1; }
+.qr { background: #fff; border-radius: 10px; padding: 8px; width: 220px; height: 220px; }
+.qr svg { width: 100%; height: 100%; display: block; }
+.key, .rps-btn { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.opt .tag { flex: none; }
+.mc .art img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+#app { max-width: 1120px; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; opacity: 1; }
+label .muted { font-size: 12px; }
+textarea, select, input[type=number] { font: inherit; font-size: 15px; padding: 10px; border-radius: 8px; border: 2px solid var(--denim-light); background: var(--denim-deep); color: var(--paper); resize: vertical; }
+input[type=color] { width: 64px; height: 44px; border: 2px solid var(--denim-light); border-radius: 8px; background: var(--denim-deep); padding: 2px; }
+input[type=password] { font: inherit; font-size: 16px; padding: 12px; border-radius: 8px; border: 2px solid var(--denim-light); background: var(--denim-deep); color: var(--paper); }
+.chk { flex-direction: row; align-items: center; gap: 8px; font-weight: 500; }
+.chk input { width: 20px; height: 20px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs .chip { flex: none; padding: 9px 14px; border-color: var(--thread); }
+.tabs .chip.on { background: var(--thread); color: var(--ink); }
+.sgrid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.ceds { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr)); gap: 14px; }
+.ced { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; background: var(--denim); border: 2px solid var(--denim-light); border-radius: 12px; padding: 12px; }
+.ced-prev .mc { width: 150px; }
+.ced-form { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sbtn { font: inherit; font-size: 14px; font-weight: 700; padding: 9px 12px; border-radius: 8px; border: 2px solid var(--paper); background: transparent; color: var(--paper); }
+.sbtn.danger { border-color: var(--hit); color: var(--hit); }
+.sbtn[disabled] { opacity: .4; }
+.upl { flex-direction: row; position: relative; font-weight: 700; font-size: 14px; padding: 9px 12px; border-radius: 8px; background: var(--thread); color: var(--ink); cursor: pointer; }
+.upl input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.warn { margin: 0; color: var(--thread); font-size: 13px; min-height: 0; }
+.pub { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--denim-deep); border-top: 2px dashed var(--thread); padding: 12px 0; margin-top: 12px; }
+.bad { color: var(--hit); }
+.spec table { border-collapse: collapse; width: 100%; font-size: 15px; }
+.spec th, .spec td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid rgba(245,236,214,.15); }
+.spec th { width: 34%; color: var(--thread); font-weight: 700; }
+.spec p { max-width: 70ch; }
+.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+a { color: var(--thread); }
+@media (max-width: 560px) { .ced { grid-template-columns: 1fr; } .ced-prev { display: flex; justify-content: center; } .sgrid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DEFAULT_CAT = {
+ "version": 1,
+ "updated": "2026-11-16",
+ "ultraNeeds": 3,
+ "series": [
+  {
+   "id": "d",
+   "name": "Динозавры",
+   "color": "#2f7a4a",
+   "size": 10,
+   "active": true,
+   "starter": true
+  },
+  {
+   "id": "c",
+   "name": "Кошки",
+   "color": "#b4531a",
+   "size": 10,
+   "active": true,
+   "starter": true
+  },
+  {
+   "id": "f",
+   "name": "Футбол",
+   "color": "#2459b3",
+   "size": 10,
+   "active": true,
+   "starter": false
+  }
+ ],
+ "cards": [
+  {
+   "id": "d1",
+   "series": "d",
+   "tier": "common",
+   "no": 1,
+   "name": "Тираннозавр",
+   "fact": "Длина до 12 метров, зубы размером с банан. Жил 68–66 млн лет назад.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M22 92 Q58 70 98 72 L118 50 Q128 38 150 40 L174 44 Q182 49 177 59 L160 62 L158 70 L140 73 Q132 92 120 100 L125 124 L112 124 L107 104 L92 106 L97 124 L84 124 L80 104 Q50 104 22 92Z\" fill=\"#2f7a4a\"/><path d=\"M128 80 l10 7 -3 4\" stroke=\"#2f7a4a\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"160\" cy=\"50\" r=\"3.5\" fill=\"#f5ecd6\"/><path d=\"M150 62 l3 4 3 -4 3 4 3 -4\" stroke=\"#f5ecd6\" stroke-width=\"2\" fill=\"none\"/>",
+   "img": null
+  },
+  {
+   "id": "d2",
+   "series": "d",
+   "tier": "common",
+   "no": 2,
+   "name": "Трицератопс",
+   "fact": "Три рога и костяной воротник. Весил как два слона. Жил 68–66 млн лет назад.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><circle cx=\"138\" cy=\"66\" r=\"28\" fill=\"#7fbf8e\"/><ellipse cx=\"92\" cy=\"86\" rx=\"52\" ry=\"27\" fill=\"#2f7a4a\"/><path d=\"M40 84 Q20 90 12 100 Q30 96 46 96Z\" fill=\"#2f7a4a\"/><path d=\"M130 70 Q160 66 176 84 Q170 100 146 100 Q128 98 124 86Z\" fill=\"#2f7a4a\"/><path d=\"M150 72 L176 50 M162 76 L190 62 M174 86 L188 80\" stroke=\"#14213a\" stroke-width=\"4\" stroke-linecap=\"round\"/><circle cx=\"152\" cy=\"82\" r=\"3.5\" fill=\"#f5ecd6\"/><rect x=\"58\" y=\"104\" width=\"13\" height=\"22\" rx=\"4\" fill=\"#2f7a4a\"/><rect x=\"108\" y=\"104\" width=\"13\" height=\"22\" rx=\"4\" fill=\"#2f7a4a\"/>",
+   "img": null
+  },
+  {
+   "id": "d3",
+   "series": "d",
+   "tier": "common",
+   "no": 3,
+   "name": "Стегозавр",
+   "fact": "Пластины на спине, шипы на хвосте и мозг размером с грецкий орех.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M48 78 L58 54 L68 78Z\" fill=\"#7fbf8e\"/><path d=\"M66 70 L76 46 L86 70Z\" fill=\"#7fbf8e\"/><path d=\"M86 66 L96 42 L106 66Z\" fill=\"#7fbf8e\"/><path d=\"M106 68 L116 44 L126 68Z\" fill=\"#7fbf8e\"/><path d=\"M124 74 L134 50 L144 74Z\" fill=\"#7fbf8e\"/><path d=\"M20 96 Q60 64 110 70 Q150 74 170 92 Q160 100 140 100 L36 100Z\" fill=\"#2f7a4a\"/><path d=\"M164 90 Q178 86 186 94 Q178 100 166 99Z\" fill=\"#2f7a4a\"/><path d=\"M26 94 L10 80 M30 96 L12 96\" stroke=\"#14213a\" stroke-width=\"4\" stroke-linecap=\"round\"/><circle cx=\"178\" cy=\"93\" r=\"2.5\" fill=\"#f5ecd6\"/><rect x=\"58\" y=\"98\" width=\"13\" height=\"26\" rx=\"4\" fill=\"#2f7a4a\"/><rect x=\"122\" y=\"98\" width=\"13\" height=\"26\" rx=\"4\" fill=\"#2f7a4a\"/>",
+   "img": null
+  },
+  {
+   "id": "d4",
+   "series": "d",
+   "tier": "common",
+   "no": 4,
+   "name": "Диплодок",
+   "fact": "Длина до 26 метров, почти как теннисный корт. Хвостом щёлкал, как хлыстом.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M10 82 Q40 92 70 84 Q100 70 128 82 Q140 60 150 34 Q156 22 168 22 Q180 24 178 32 Q168 34 162 40 Q152 70 150 92 Q130 106 80 102 Q40 100 10 82Z\" fill=\"#2f7a4a\"/><circle cx=\"170\" cy=\"28\" r=\"2.5\" fill=\"#f5ecd6\"/><rect x=\"74\" y=\"98\" width=\"13\" height=\"27\" rx=\"4\" fill=\"#2f7a4a\"/><rect x=\"126\" y=\"96\" width=\"13\" height=\"29\" rx=\"4\" fill=\"#2f7a4a\"/>",
+   "img": null
+  },
+  {
+   "id": "d5",
+   "series": "d",
+   "tier": "common",
+   "no": 5,
+   "name": "Птеранодон",
+   "fact": "Вовсе не динозавр, а летающий ящер. Размах крыльев до 7 метров.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M100 66 L12 40 Q40 70 70 80 L100 84 L130 80 Q160 70 188 40Z\" fill=\"#2f7a4a\"/><path d=\"M92 60 Q100 50 110 58 L112 84 L92 84Z\" fill=\"#2f7a4a\"/><path d=\"M104 54 L132 50 L106 60Z M100 52 L80 40 L96 56Z\" fill=\"#7fbf8e\"/><circle cx=\"106\" cy=\"56\" r=\"2.5\" fill=\"#f5ecd6\"/>",
+   "img": null
+  },
+  {
+   "id": "d6",
+   "series": "d",
+   "tier": "common",
+   "no": 6,
+   "name": "Анкилозавр",
+   "fact": "Весь в броне, а на конце хвоста костяная булава.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "d7",
+   "series": "d",
+   "tier": "common",
+   "no": 7,
+   "name": "Велоцираптор",
+   "fact": "Размером с крупную индейку и покрыт перьями.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "d8",
+   "series": "d",
+   "tier": "common",
+   "no": 8,
+   "name": "Спинозавр",
+   "fact": "Хищник с парусом на спине. Любил ловить рыбу.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "d9",
+   "series": "d",
+   "tier": "common",
+   "no": 9,
+   "name": "Брахиозавр",
+   "fact": "Передние ноги длиннее задних, а голова высоко, как у жирафа.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "d10",
+   "series": "d",
+   "tier": "common",
+   "no": 10,
+   "name": "Паразауролоф",
+   "fact": "Трубчатый гребень на голове помогал ему трубить.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "c1",
+   "series": "c",
+   "tier": "common",
+   "no": 1,
+   "name": "Мейн-кун",
+   "fact": "Один из самых крупных котов. На ушах кисточки, как у рыси.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#7a5228\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#a8763e\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#7a5228\"/><path d=\"M80 14 L78 2 M120 14 L122 2\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#a8763e\"/><path d=\"M100 22 L100 34 M90 24 L92 34 M110 24 L108 34\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M70 92 L90 90 M70 104 L92 102 M130 92 L110 90 M130 104 L108 102\" stroke=\"#7a5228\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/>",
+   "img": null
+  },
+  {
+   "id": "c2",
+   "series": "c",
+   "tier": "common",
+   "no": 2,
+   "name": "Сфинкс",
+   "fact": "Почти без шерсти и тёплый на ощупь. Любит свитера и одеяла.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#e9b8a6\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#e9b8a6\"/><path d=\"M70 48 L72 8 L98 34Z M130 48 L128 8 L102 34Z\" fill=\"#e9b8a6\"/><path d=\"M76 40 L77 18 L92 34Z M124 40 L123 18 L108 34Z\" fill=\"#e8a3a0\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#e9b8a6\"/><path d=\"M88 30 Q100 26 112 30 M90 36 Q100 33 110 36\" stroke=\"#c98e7b\" stroke-width=\"1.6\" fill=\"none\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#7fc3c9\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#7fc3c9\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#e9b8a6\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#e9b8a6\"/>",
+   "img": null
+  },
+  {
+   "id": "c3",
+   "series": "c",
+   "tier": "common",
+   "no": 3,
+   "name": "Британская",
+   "fact": "Плотная плюшевая шерсть и круглые медные глаза. Самый известный окрас голубой.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#6f7b8c\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#8b97a8\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#6f7b8c\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#8b97a8\"/><ellipse cx=\"88\" cy=\"64\" rx=\"10\" ry=\"6\" fill=\"#9ea9b8\"/><ellipse cx=\"112\" cy=\"64\" rx=\"10\" ry=\"6\" fill=\"#9ea9b8\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#e0943a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#e0943a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#8b97a8\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#8b97a8\"/>",
+   "img": null
+  },
+  {
+   "id": "c4",
+   "series": "c",
+   "tier": "common",
+   "no": 4,
+   "name": "Сиамская",
+   "fact": "Голубые глаза, а уши, мордочка, лапы и хвост темнее остального меха.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#5b4334\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#efe0c4\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#5b4334\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#efe0c4\"/><ellipse cx=\"100\" cy=\"60\" rx=\"16\" ry=\"14\" fill=\"#5b4334\" opacity=\".85\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#5aa7e0\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#5aa7e0\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#5b4334\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#5b4334\"/>",
+   "img": null
+  },
+  {
+   "id": "c5",
+   "series": "c",
+   "tier": "common",
+   "no": 5,
+   "name": "Шотландская вислоухая",
+   "fact": "Ушки загнуты вперёд и прижаты к голове. Умеет сидеть столбиком.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#9c7650\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#c9a27a\"/><path d=\"M76 34 Q80 24 92 30 Q86 36 76 38Z M124 34 Q120 24 108 30 Q114 36 124 38Z\" fill=\"#9c7650\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#c9a27a\"/><path d=\"M74 52 L82 52 M118 52 L126 52\" stroke=\"#9c7650\" stroke-width=\"0\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#e0943a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#e0943a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#c9a27a\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#c9a27a\"/>",
+   "img": null
+  },
+  {
+   "id": "c6",
+   "series": "c",
+   "tier": "common",
+   "no": 6,
+   "name": "Бенгальская",
+   "fact": "Пятнистая, как маленький леопард, и не боится воды.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "c7",
+   "series": "c",
+   "tier": "common",
+   "no": 7,
+   "name": "Персидская",
+   "fact": "Длинная пушистая шерсть и приплюснутая мордочка.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "c8",
+   "series": "c",
+   "tier": "common",
+   "no": 8,
+   "name": "Русская голубая",
+   "fact": "Серо-голубая шерсть и ярко-зелёные глаза.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "c9",
+   "series": "c",
+   "tier": "common",
+   "no": 9,
+   "name": "Рэгдолл",
+   "fact": "Обмякает на руках, как тряпичная кукла. Отсюда и название.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "c10",
+   "series": "c",
+   "tier": "common",
+   "no": 10,
+   "name": "Абиссинская",
+   "fact": "Одна из древнейших пород. Очень любопытная.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "f1",
+   "series": "f",
+   "tier": "common",
+   "no": 1,
+   "name": "Гоша Перчаткин",
+   "fact": "Вратарь. Ловит мяч в прыжке и никогда не моргает на пенальти.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#6fcf97\"/><path d=\"M52 82 Q100 70 148 82 L150 106 Q140 128 100 128 Q60 128 50 106Z\" fill=\"#e0943a\"/><text x=\"100\" y=\"116\" text-anchor=\"middle\" font-family=\"Dela Gothic One, sans-serif\" font-size=\"22\" fill=\"#f5ecd6\">1</text><circle cx=\"84\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><path d=\"M90 68 Q100 75 110 68\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><ellipse cx=\"40\" cy=\"78\" rx=\"13\" ry=\"15\" fill=\"#f5ecd6\" stroke=\"#14213a\" stroke-width=\"2\"/><ellipse cx=\"160\" cy=\"78\" rx=\"13\" ry=\"15\" fill=\"#f5ecd6\" stroke=\"#14213a\" stroke-width=\"2\"/>",
+   "img": null
+  },
+  {
+   "id": "f2",
+   "series": "f",
+   "tier": "common",
+   "no": 2,
+   "name": "Борис Стенкин",
+   "fact": "Защитник. Мимо него не проходит ни мяч, ни муха.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#6fcf97\"/><path d=\"M52 82 Q100 70 148 82 L150 106 Q140 128 100 128 Q60 128 50 106Z\" fill=\"#2459b3\"/><text x=\"100\" y=\"116\" text-anchor=\"middle\" font-family=\"Dela Gothic One, sans-serif\" font-size=\"22\" fill=\"#f5ecd6\">4</text><circle cx=\"84\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><path d=\"M90 68 Q100 75 110 68\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"172\" cy=\"116\" r=\"12\" fill=\"#fff\" stroke=\"#14213a\" stroke-width=\"2\"/><path d=\"M168 110 L176 110 L179 117 L172 122 L165 117Z\" fill=\"#14213a\"/>",
+   "img": null
+  },
+  {
+   "id": "f3",
+   "series": "f",
+   "tier": "common",
+   "no": 3,
+   "name": "Миша Пасов",
+   "fact": "Полузащитник. Видит всё поле и отдаёт пас вслепую.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#6fcf97\"/><path d=\"M52 82 Q100 70 148 82 L150 106 Q140 128 100 128 Q60 128 50 106Z\" fill=\"#2459b3\"/><text x=\"100\" y=\"116\" text-anchor=\"middle\" font-family=\"Dela Gothic One, sans-serif\" font-size=\"22\" fill=\"#f5ecd6\">8</text><circle cx=\"84\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><path d=\"M90 68 Q100 75 110 68\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"172\" cy=\"116\" r=\"12\" fill=\"#fff\" stroke=\"#14213a\" stroke-width=\"2\"/><path d=\"M168 110 L176 110 L179 117 L172 122 L165 117Z\" fill=\"#14213a\"/>",
+   "img": null
+  },
+  {
+   "id": "f4",
+   "series": "f",
+   "tier": "common",
+   "no": 4,
+   "name": "Вася Гольцов",
+   "fact": "Нападающий. Бьёт с любой ноги и празднует гол колесом.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#6fcf97\"/><path d=\"M52 82 Q100 70 148 82 L150 106 Q140 128 100 128 Q60 128 50 106Z\" fill=\"#2459b3\"/><text x=\"100\" y=\"116\" text-anchor=\"middle\" font-family=\"Dela Gothic One, sans-serif\" font-size=\"22\" fill=\"#f5ecd6\">9</text><circle cx=\"84\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><path d=\"M90 68 Q100 75 110 68\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"172\" cy=\"116\" r=\"12\" fill=\"#fff\" stroke=\"#14213a\" stroke-width=\"2\"/><path d=\"M168 110 L176 110 L179 117 L172 122 L165 117Z\" fill=\"#14213a\"/>",
+   "img": null
+  },
+  {
+   "id": "f5",
+   "series": "f",
+   "tier": "common",
+   "no": 5,
+   "name": "Тёма Капитанов",
+   "fact": "Капитан. Первым выходит на поле и последним уходит.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#6fcf97\"/><path d=\"M52 82 Q100 70 148 82 L150 106 Q140 128 100 128 Q60 128 50 106Z\" fill=\"#2459b3\"/><text x=\"100\" y=\"116\" text-anchor=\"middle\" font-family=\"Dela Gothic One, sans-serif\" font-size=\"22\" fill=\"#f5ecd6\">10</text><circle cx=\"84\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"52\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"54\" r=\"5\" fill=\"#14213a\"/><path d=\"M90 68 Q100 75 110 68\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><rect x=\"132\" y=\"84\" width=\"16\" height=\"9\" rx=\"2\" fill=\"#f2c14e\" transform=\"rotate(12 140 88)\"/><text x=\"141\" y=\"92\" text-anchor=\"middle\" font-family=\"Golos Text, sans-serif\" font-weight=\"700\" font-size=\"8\" fill=\"#14213a\" transform=\"rotate(12 140 88)\">К</text><circle cx=\"172\" cy=\"116\" r=\"12\" fill=\"#fff\" stroke=\"#14213a\" stroke-width=\"2\"/><path d=\"M168 110 L176 110 L179 117 L172 122 L165 117Z\" fill=\"#14213a\"/>",
+   "img": null
+  },
+  {
+   "id": "f6",
+   "series": "f",
+   "tier": "common",
+   "no": 6,
+   "name": "Соня Финтова",
+   "fact": "Вингер. Обводит троих и не теряет мяч.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "f7",
+   "series": "f",
+   "tier": "common",
+   "no": 7,
+   "name": "Петя Подкатов",
+   "fact": "Защитник. Его подкат чистый, как стекло.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "f8",
+   "series": "f",
+   "tier": "common",
+   "no": 8,
+   "name": "Ника Навесова",
+   "fact": "Полузащитница. Навес с фланга прямо на голову.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "f9",
+   "series": "f",
+   "tier": "common",
+   "no": 9,
+   "name": "Даня Штангин",
+   "fact": "Нападающий. Попадает в штангу чаще всех, но всё равно забивает.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "f10",
+   "series": "f",
+   "tier": "common",
+   "no": 10,
+   "name": "Гриша Запасной",
+   "fact": "Запасной. Всегда готов выйти и всё изменить.",
+   "art": null,
+   "img": null
+  },
+  {
+   "id": "rd",
+   "series": "d",
+   "tier": "rare",
+   "name": "Золотой тираннозавр",
+   "fact": "За полную серию «Динозавры».",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#c9971c\" opacity=\"0.3\"/><path d=\"M22 92 Q58 70 98 72 L118 50 Q128 38 150 40 L174 44 Q182 49 177 59 L160 62 L158 70 L140 73 Q132 92 120 100 L125 124 L112 124 L107 104 L92 106 L97 124 L84 124 L80 104 Q50 104 22 92Z\" fill=\"#c9971c\"/><path d=\"M128 80 l10 7 -3 4\" stroke=\"#c9971c\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"160\" cy=\"50\" r=\"3.5\" fill=\"#f5ecd6\"/><path d=\"M150 62 l3 4 3 -4 3 4 3 -4\" stroke=\"#f5ecd6\" stroke-width=\"2\" fill=\"none\"/><path d=\"M150 30 l4 -10 4 10 M162 32 l5 -9 2 11\" stroke=\"#c9971c\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>",
+   "img": null
+  },
+  {
+   "id": "rc",
+   "series": "c",
+   "tier": "rare",
+   "name": "Кот в сапогах",
+   "fact": "За полную серию «Кошки».",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#a8622a\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#d9893f\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#a8622a\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#d9893f\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#d9893f\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#d9893f\"/><path d=\"M64 26 Q100 4 136 26 L130 32 Q100 18 70 32Z\" fill=\"#14213a\"/><path d=\"M118 14 Q140 -2 150 12 Q138 10 126 20Z\" fill=\"#c0392b\"/><rect x=\"74\" y=\"112\" width=\"22\" height=\"16\" rx=\"4\" fill=\"#5b3a22\"/><rect x=\"104\" y=\"112\" width=\"22\" height=\"16\" rx=\"4\" fill=\"#5b3a22\"/>",
+   "img": null
+  },
+  {
+   "id": "rf",
+   "series": "f",
+   "tier": "rare",
+   "name": "Золотая бутса",
+   "fact": "За полную серию «Футбол».",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M50 50 L92 50 L96 84 Q130 86 156 96 Q170 102 166 112 L48 112 Q40 112 42 100Z\" fill=\"#c9971c\"/><path d=\"M50 50 L92 50\" stroke=\"#14213a\" stroke-width=\"3\"/><path d=\"M60 64 L84 70 M60 76 L86 82\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M48 112 L166 112\" stroke=\"#14213a\" stroke-width=\"4\"/><rect x=\"60\" y=\"112\" width=\"7\" height=\"9\" fill=\"#14213a\"/><rect x=\"84\" y=\"112\" width=\"7\" height=\"9\" fill=\"#14213a\"/><rect x=\"118\" y=\"112\" width=\"7\" height=\"9\" fill=\"#14213a\"/><rect x=\"146\" y=\"112\" width=\"7\" height=\"9\" fill=\"#14213a\"/><path d=\"M150 50 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1Z\" fill=\"#fff\"/>",
+   "img": null
+  },
+  {
+   "id": "ux",
+   "series": "x",
+   "tier": "ultra",
+   "name": "Карманец-чемпион",
+   "fact": "За три редкие карточки из разных серий.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#f2d27a\" opacity=\"0.3\"/><path d=\"M58 70 Q50 40 74 30 Q100 18 126 30 Q150 40 142 70 L150 104 Q140 128 100 128 Q60 128 50 104Z\" fill=\"#b58df1\"/><path d=\"M72 30 L76 8 L88 22 L100 4 L112 22 L124 8 L128 30Z\" fill=\"#f2d27a\" stroke=\"#c9971c\" stroke-width=\"2\"/><circle cx=\"84\" cy=\"56\" r=\"11\" fill=\"#fff\"/><circle cx=\"116\" cy=\"56\" r=\"11\" fill=\"#fff\"/><circle cx=\"86\" cy=\"58\" r=\"5\" fill=\"#14213a\"/><circle cx=\"114\" cy=\"58\" r=\"5\" fill=\"#14213a\"/><path d=\"M88 74 Q100 84 112 74\" stroke=\"#14213a\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M150 70 L176 70 L172 90 Q163 100 154 90Z\" fill=\"#f2d27a\" stroke=\"#c9971c\" stroke-width=\"2\"/><rect x=\"159\" y=\"98\" width=\"8\" height=\"12\" fill=\"#c9971c\"/><rect x=\"152\" y=\"110\" width=\"22\" height=\"6\" rx=\"2\" fill=\"#c9971c\"/><path d=\"M24 40 l2 5 5 1 -4 3 1 5 -4 -3 -4 3 1 -5 -4 -3 5 -1Z M40 96 l2 4 4 1 -3 3 1 4 -4 -2 -3 2 1 -4 -3 -3 4 -1Z\" fill=\"#f2d27a\"/>",
+   "img": null,
+   "edition": null
+  },
+  {
+   "id": "lim",
+   "series": "x",
+   "tier": "limited",
+   "name": "Первый карман",
+   "fact": "Всего 100 штук, только от мастера игры.",
+   "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#f2d27a\" opacity=\"0.3\"/><path d=\"M48 40 H152 V96 L100 126 L48 96Z\" fill=\"#24457a\"/><path d=\"M56 48 H144 V92 L100 117 L56 92Z\" fill=\"none\" stroke=\"#f2d27a\" stroke-width=\"2.5\" stroke-dasharray=\"6 5\"/><circle cx=\"56\" cy=\"48\" r=\"4\" fill=\"#d9824a\"/><circle cx=\"144\" cy=\"48\" r=\"4\" fill=\"#d9824a\"/><path d=\"M72 44 Q72 18 100 16 Q128 18 128 44Z\" fill=\"#6fcf97\"/><circle cx=\"90\" cy=\"32\" r=\"6\" fill=\"#fff\"/><circle cx=\"110\" cy=\"32\" r=\"6\" fill=\"#fff\"/><circle cx=\"91\" cy=\"33\" r=\"3\" fill=\"#14213a\"/><circle cx=\"109\" cy=\"33\" r=\"3\" fill=\"#14213a\"/><path d=\"M80 22 Q76 10 84 6 M120 22 Q124 10 116 6\" stroke=\"#6fcf97\" stroke-width=\"5\" stroke-linecap=\"round\" fill=\"none\"/><path d=\"M64 44 Q66 38 72 40 M128 40 Q134 38 136 44\" stroke=\"#6fcf97\" stroke-width=\"6\" stroke-linecap=\"round\" fill=\"none\"/>",
+   "img": null,
+   "edition": "№17/100"
+  }
+ ]
+};
+const COLORS = ['#f26b4e', '#f2c14e', '#6fcf97', '#b58df1', '#5ec4e8'];
+const NAMES = ['Фантик', 'Пуговка', 'Шнурок', 'Крошка', 'Жвачка', 'Скрепка'];
+const ROLES = [
+  { id: 'war', name: 'Воин', short: 'камень, ножницы, бумага', rule: 'Камень, ножницы, бумага: выбирайте втайне' },
+  { id: 'math', name: 'Математик', short: 'счёт на скорость', rule: 'Кто быстрее решит свой пример' },
+  { id: 'word', name: 'Грамотей', short: 'слово на слух', rule: 'Кто быстрее и без ошибок запишет слово' }
+];
+const MLEVELS = ['Сложение и вычитание до 20', 'Двузначные числа', 'Таблица умножения', 'Умножение и деление двузначных'];
+const WLEVELS = ['Простые слова', 'Слова с подвохом', 'Трудные слова'];
+const WORDS = [
+  [['молоко','м_локо'],['корова','к_рова'],['собака','с_бака'],['ворона','в_рона'],['машина','маш_на'],['мороз','моро_'],['заяц','за_ц'],['берёза','б_рёза'],['ребята','р_бята'],['пенал','п_нал']],
+  [['солнце','со_нце'],['лестница','лес_ница'],['сердце','сер_це'],['праздник','праз_ник'],['чувство','чу_ство'],['здравствуй','здра_ствуй'],['капуста','к_пуста'],['лягушка','лягу_ка'],['завтрак','за_трак'],['медведь','м_дведь']],
+  [['расстояние','ра__тояние'],['искусство','иску__тво'],['аккуратный','а__уратный'],['территория','те__итория'],['велосипед','в_л_сипед'],['инженер','инж_нер'],['путешествие','пут_шествие'],['горизонт','г_р_зонт'],['интересный','инт_ресный'],['коллекция','ко__екция']]
+];
+const KB_RU = ['йцукенгшщзхъ', 'фывапролджэ', 'ячсмитьбюё'];
+const KB_EN = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+const WORDS_EN = [
+  [['cat','c_t'],['dog','d_g'],['sun','s_n'],['fish','f_sh'],['book','b_ok'],['apple','app_e'],['house','ho_se'],['green','gre_n'],['water','wat_r'],['happy','h_ppy'],['milk','m_lk'],['tree','tr_e'],['bird','b_rd'],['frog','fr_g'],['duck','d_ck'],['cake','c_ke'],['bread','br_ad'],['chair','cha_r'],['smile','sm_le'],['juice','ju_ce']],
+  [['friend','fri_nd'],['school','scho_l'],['because','b_cause'],['people','pe_ple'],['family','fam_ly'],['orange','or_nge'],['yellow','yell_w'],['purple','p_rple'],['animal','an_mal'],['garden','gard_n'],['monkey','monk_y'],['pencil','penc_l'],['window','wind_w'],['summer','s_mmer'],['winter','wint_r'],['flower','flow_r'],['castle','c_stle'],['rabbit','rabb_t'],['birthday','birthd_y'],['teacher','t_acher']],
+  [['beautiful','beaut_f_l'],['Wednesday','W_dn_sday'],['science','sc__nce'],['knife','kn_fe'],['island','isl_nd'],['necessary','n_c_ssary'],['February','F_bru_ry'],['believe','b_l_eve'],['question','qu_sti_n'],['through','thr__gh'],['library','l_br_ry'],['different','d_ffer_nt'],['tomorrow','t_m_rrow'],['surprise','s_rpr_se'],['autumn','autu_n'],['dinosaur','dinos__r'],['elephant','el_ph_nt'],['answer','an_wer'],['scissors','sc_ss_rs'],['chocolate','ch_c_late']]
+];
+const WLEVELS_EN = ['Простые слова', 'Посложнее', 'Слова с подвохом'];
+/* ---------- card catalog (cards.json) ---------- */
+let CAT = null, CARDS = {}, SERIES = {}, SER = {}, RARE_OF = {}, SER_LIST = [];
+const PLACEHOLDER_ART = '<g fill="#14213a" opacity=".12"><ellipse cx="100" cy="128" rx="70" ry="7"/></g><text x="100" y="86" text-anchor="middle" font-family="Dela Gothic One, sans-serif" font-size="54" fill="#14213a" opacity=".22">?</text>';
+function applyCat(cat) {
+  CAT = cat; CARDS = {}; SERIES = {}; SER = {}; RARE_OF = {}; SER_LIST = [];
+  (cat.series || []).forEach(x => { SER[x.id] = x; SERIES[x.id] = x.name; if (x.active !== false) SER_LIST.push(x); });
+  SER.x = { id: 'x', name: 'Все серии', color: '#b58df1', active: true };
+  (cat.cards || []).forEach(c => {
+    const sr = SER[c.series]; if (!sr) return;
+    CARDS[c.id] = { id: c.id, s: c.series, ser: c.tier === 'limited' ? 'Выпуск мастера' : sr.name, no: c.no, name: c.name, fact: c.fact || '', art: c.art, img: c.img, tier: c.tier, edition: c.edition, color: sr.color, active: sr.active !== false };
+    if (c.tier === 'rare') RARE_OF[c.series] = c.id;
+  });
+}
+function serSize(s) { return (SER[s] && SER[s].size) || 10; }
+function cardArt(c) {
+  if (c.img) return `<img src="${esc(c.img)}" alt="" loading="lazy" decoding="async">`;
+  return `<svg viewBox="0 0 200 140" aria-hidden="true">${c.art || PLACEHOLDER_ART}</svg>`;
+}
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+const sum = a => a.reduce((x, y) => x + y, 0);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function creature(c, cls) {
+  const tops = [
+    `<ellipse cx="34" cy="34" rx="11" ry="17" fill="${c.color}" transform="rotate(-18 34 34)"/><ellipse cx="86" cy="34" rx="11" ry="17" fill="${c.color}" transform="rotate(18 86 34)"/>`,
+    `<path d="M38 44 L30 18 L50 38Z" fill="#f5ecd6"/><path d="M82 44 L90 18 L70 38Z" fill="#f5ecd6"/>`,
+    `<path d="M60 40 L60 16" stroke="${c.color}" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="13" r="8" fill="#f5ecd6"/>`
+  ];
+  const acc = {
+    war: `<path d="M24 53 Q60 40 96 53" stroke="#e5533d" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M96 53 l13 -7 M96 53 l13 6" stroke="#e5533d" stroke-width="5" stroke-linecap="round"/>`,
+    math: `<g fill="none" stroke="#14213a" stroke-width="3.5" stroke-linecap="round"><circle cx="46" cy="64" r="13"/><circle cx="74" cy="64" r="13"/><path d="M33 61 l-9 -4 M87 61 l9 -4"/></g>`,
+    word: `<g transform="rotate(32 96 44)" stroke="#14213a" stroke-width="2" stroke-linejoin="round"><rect x="91" y="24" width="10" height="34" fill="#f2c14e"/><path d="M91 58 L96 70 L101 58Z" fill="#f5ecd6"/><rect x="91" y="18" width="10" height="7" fill="#ff8fa3"/></g>`
+  };
+  return `<svg class="${cls || ''}" viewBox="0 0 120 120" aria-hidden="true">
+    ${tops[c.kind]}
+    <ellipse cx="44" cy="108" rx="13" ry="7" fill="#14213a" opacity=".35"/><ellipse cx="76" cy="108" rx="13" ry="7" fill="#14213a" opacity=".35"/>
+    <path d="M60 34 C92 34 102 58 100 78 C98 100 80 108 60 108 C40 108 22 100 20 78 C18 58 28 34 60 34Z" fill="${c.color}"/>
+    <ellipse cx="60" cy="86" rx="22" ry="15" fill="#fff" opacity=".28"/>
+    <circle cx="46" cy="64" r="10" fill="#fff"/><circle cx="74" cy="64" r="10" fill="#fff"/>
+    <circle cx="48" cy="66" r="4.5" fill="#14213a"/><circle cx="72" cy="66" r="4.5" fill="#14213a"/>
+    <path d="M52 82 Q60 89 68 82" stroke="#14213a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${acc[c.role] || ''}
+  </svg>`;
+}
+function egg(taps) {
+  const cracks = [
+    '<path d="M70 62 L84 78 L76 90 L92 104" />',
+    '<path d="M130 70 L116 84 L126 98 L112 110" /><path d="M92 104 L104 112 L112 110" />'
+  ];
+  return `<svg viewBox="0 0 200 230" aria-hidden="true">
+    <ellipse cx="100" cy="214" rx="62" ry="10" fill="#000" opacity=".25"/>
+    <path d="M100 14 C150 14 176 96 176 138 C176 184 142 210 100 210 C58 210 24 184 24 138 C24 96 50 14 100 14Z" fill="#f5ecd6"/>
+    <circle cx="70" cy="130" r="9" fill="#f2a93b" opacity=".6"/><circle cx="128" cy="150" r="13" fill="#f2a93b" opacity=".6"/><circle cx="104" cy="60" r="7" fill="#f2a93b" opacity=".6"/><circle cx="62" cy="170" r="6" fill="#f2a93b" opacity=".6"/>
+    <g fill="none" stroke="#14213a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${cracks.slice(0, taps).join('')}</g>
+  </svg>`;
+}
+function rivets(hp, lostNow, max) {
+  max = max || 6;
+  let h = '';
+  for (let i = 0; i < max; i++) h += `<span class="rivet ${i < hp ? '' : 'lost'} ${i >= hp && i < hp + (lostNow || 0) ? 'just' : ''}"></span>`;
+  return `<div class="rivets" role="img" aria-label="Жизней: ${Math.max(hp, 0)} из ${max}">${h}</div>`;
+}
+const sec = ms => (ms / 1000).toFixed(1).replace('.', ',');
+const norm = s => String(s).trim().toLowerCase().replace(/ё/g, 'е');
+const ICON_MIC = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>';
+function winFx() {
+  const cols = ['#f2a93b', '#6fcf97', '#ff6b57', '#5ec4e8', '#f2d27a', '#b58df1'];
+  let s = '';
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, d = 90 + (i % 3) * 30; s += `<i class="spark" style="background:${cols[i % 6]};--dx:${Math.round(Math.cos(a) * d)}px;--dy:${Math.round(Math.sin(a) * d)}px;--r:${i * 47}deg"></i>`; }
+  return s;
+}
+const RPS = { rock: 'Камень', scissors: 'Ножницы', paper: 'Бумага' };
+const BEATS = { rock: 'scissors', scissors: 'paper', paper: 'rock' };
+function rpsIcon(k, cls) {
+  const a = `class="${cls || ''}" viewBox="0 0 100 100" aria-hidden="true"`;
+  if (k === 'rock') return `<svg ${a}><path d="M18 62 Q12 40 30 30 Q40 16 58 22 Q78 20 84 40 Q92 60 76 74 Q60 86 40 82 Q22 80 18 62Z" fill="#9aa3b5"/><path d="M34 40 Q42 34 50 40 M58 52 Q66 46 72 54 M36 64 Q44 60 50 66" stroke="#6c7488" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`;
+  if (k === 'scissors') return `<svg ${a}><path d="M50 52 L82 14" stroke="#cfd6e6" stroke-width="9" stroke-linecap="round"/><path d="M50 52 L84 70" stroke="#cfd6e6" stroke-width="9" stroke-linecap="round"/><circle cx="34" cy="38" r="13" fill="none" stroke="#ff6b57" stroke-width="7"/><circle cx="34" cy="70" r="13" fill="none" stroke="#ff6b57" stroke-width="7"/><path d="M44 46 L52 52 L44 60" stroke="#ff6b57" stroke-width="7" fill="none" stroke-linejoin="round"/><circle cx="51" cy="52" r="4" fill="#14213a"/></svg>`;
+  if (k === 'paper') return `<svg ${a}><path d="M24 12 H64 L80 28 V88 H24Z" fill="#f5ecd6"/><path d="M64 12 V28 H80" fill="#d8ccad"/><path d="M34 44 H70 M34 56 H70 M34 68 H60" stroke="#9aa3b5" stroke-width="4" stroke-linecap="round"/></svg>`;
+  return `<svg ${a}><path d="M26 44 Q26 30 40 30 H66 Q80 30 80 46 V64 Q80 84 58 84 H44 Q26 84 26 66Z" fill="#f2c14e"/><path d="M40 30 V46 M53 30 V46 M66 31 V46" stroke="#c99a2e" stroke-width="4" stroke-linecap="round"/><path d="M26 54 Q16 52 18 42" stroke="#f2c14e" stroke-width="10" stroke-linecap="round" fill="none"/></svg>`;
+}
+function commons() { return Object.keys(CARDS).filter(k => CARDS[k].tier === 'common' && CARDS[k].active); }
+function mc(id, o) {
+  o = o || {}; const c = CARDS[id]; if (!c) return '';
+  const num = c.tier === 'common' ? `№${c.no}/${serSize(c.s)}` : c.tier === 'limited' ? (c.edition || 'Лимит') : ({ rare: 'Редкая', ultra: 'Ультра' })[c.tier];
+  const topStyle = c.tier === 'common' ? ` style="background:${esc(c.color)}"` : '';
+  const inner = `<span class="top"${topStyle}><span>${esc(c.ser)}</span><span>${num}</span></span>
+    <span class="art">${cardArt(c)}</span>
+    <span class="nm">${esc(c.name)}</span>${o.big ? `<span class="fact">${esc(c.fact)}</span>` : ''}
+    ${o.count > 1 ? `<span class="cnt">×${o.count}</span>` : ''}${o.glued ? '<span class="glued">в альбоме</span>' : ''}${o.need ? '<span class="glued" style="background:var(--thread)">нужна</span>' : ''}`;
+  const cls = `mc ${c.tier} ${o.big ? 'big' : ''} ${o.sel ? 'sel' : ''} ${o.gone ? 'gone' : ''}`;
+  return o.act ? `<button class="${cls}" data-act="${o.act}" data-id="${id}" ${o.side ? `data-p="${o.side}"` : ''} aria-label="${esc(c.name)}" aria-pressed="${!!o.sel}">${inner}</button>` : `<div class="${cls}">${inner}</div>`;
+}
+function mathTask(l) {
+  let a, b;
+  if (l === 1) { a = 2 + rnd(8); b = 2 + rnd(8); return Math.random() < .5 ? { text: `${a} + ${b}`, ans: a + b } : { text: `${a + b} − ${a}`, ans: b }; }
+  if (l === 2) { a = 11 + rnd(49); b = 11 + rnd(29); return Math.random() < .5 ? { text: `${a} + ${b}`, ans: a + b } : { text: `${a + b} − ${b}`, ans: a }; }
+  if (l === 3) { a = 2 + rnd(8); b = 2 + rnd(8); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${a}`, ans: b }; }
+  a = 12 + rnd(38); b = 3 + rnd(5); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${b}`, ans: a };
+}
+/* ================= Кабинет карточек =================
+   Edits cards.json and card illustrations in the GitHub repository that hosts the game.
+   Everything is published in one commit through the GitHub API with a personal token
+   that stays in this browser only. */
+
+const REPO = 'vlaorekh-hash/karmantsy', BRANCH = 'main', API = 'https://api.github.com/repos/' + REPO;
+const ART_W = 1000, ART_H = 700;          // stored illustration size (10:7)
+const MIN_W = 1000, MIN_H = 700;          // smallest source we accept without a warning
+const MAX_FILE = 15 * 1024 * 1024;
+
+let TOKEN = '';
+try { TOKEN = localStorage.getItem('k2-admin-token') || ''; } catch (e) {}
+let A = { cat: null, sha: null, tab: null, dirty: 0, msg: '', err: '', busy: false, showToken: !TOKEN };
+const PENDING = {};     // path -> { b64, url, type }
+const REMOVED = new Set();
+
+/* ---------- GitHub ---------- */
+async function gh(path, opts) {
+  opts = opts || {};
+  const r = await fetch(API + path, { ...opts, headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + TOKEN, 'X-GitHub-Api-Version': '2022-11-28', ...(opts.body ? { 'Content-Type': 'application/json' } : {}) } });
+  if (!r.ok) {
+    let t = ''; try { t = (await r.json()).message || ''; } catch (e) {}
+    const e = new Error(r.status === 401 ? 'Токен не подошёл. Проверьте его или создайте новый.' : r.status === 403 || r.status === 404 ? 'Нет доступа к репозиторию karmantsy. Проверьте, что у токена выбран этот репозиторий и права Contents: Read and write.' : 'GitHub ответил: ' + r.status + ' ' + t);
+    e.status = r.status; throw e;
+  }
+  return r.status === 204 ? null : r.json();
+}
+const b64ToText = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, '')), c => c.charCodeAt(0)));
+async function loadCatalog() {
+  A.busy = true; A.err = ''; A.msg = 'Загружаю каталог…'; render();
+  try {
+    const f = await gh('/contents/cards.json?ref=' + BRANCH);
+    A.cat = JSON.parse(b64ToText(f.content)); A.sha = f.sha;
+    A.tab = A.tab || (A.cat.series[0] && A.cat.series[0].id) || 'specs';
+    Object.keys(PENDING).forEach(k => delete PENDING[k]); REMOVED.clear(); A.dirty = 0;
+    A.msg = 'Каталог загружен.'; A.showToken = false;
+  } catch (e) { A.err = e.message; A.msg = ''; if (e.status === 401) A.showToken = true; }
+  A.busy = false; render();
+}
+async function publish() {
+  if (!A.cat || A.busy) return;
+  const problems = validate(); if (problems.length) { A.err = problems.join(' '); render(); return; }
+  A.busy = true; A.err = ''; A.msg = 'Публикую…'; render();
+  try {
+    const now = await gh('/contents/cards.json?ref=' + BRANCH);
+    if (now.sha !== A.sha) throw new Error('Каталог на GitHub изменился после того, как вы его открыли. Сохраните свои картинки отдельно, нажмите «Загрузить заново» и повторите правки.');
+    const ref = await gh('/git/ref/heads/' + BRANCH);
+    const base = await gh('/git/commits/' + ref.object.sha);
+    const tree = [];
+    let i = 0; const paths = Object.keys(PENDING).filter(p => usedPaths().has(p));
+    for (const p of paths) {
+      i++; A.msg = `Загружаю картинки: ${i} из ${paths.length}…`; render();
+      const blob = await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: PENDING[p].b64, encoding: 'base64' }) });
+      tree.push({ path: p, mode: '100644', type: 'blob', sha: blob.sha });
+    }
+    REMOVED.forEach(p => { if (!usedPaths().has(p) && !PENDING[p]) tree.push({ path: p, mode: '100644', type: 'blob', sha: null }); });
+    A.cat.version = (A.cat.version || 1) + 1; A.cat.updated = new Date().toISOString().slice(0, 10);
+    A.cat.series.forEach(s => { s.size = A.cat.cards.filter(c => c.series === s.id && c.tier === 'common').length; });
+    const json = JSON.stringify(A.cat, null, 1) + '\n';
+    const jb = await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: json, encoding: 'utf-8' }) });
+    tree.push({ path: 'cards.json', mode: '100644', type: 'blob', sha: jb.sha });
+    A.msg = 'Сохраняю…'; render();
+    const t = await gh('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: base.tree.sha, tree }) });
+    const c = await gh('/git/commits', { method: 'POST', body: JSON.stringify({ message: `Каталог карточек: версия ${A.cat.version}`, tree: t.sha, parents: [ref.object.sha] }) });
+    await gh('/git/refs/heads/' + BRANCH, { method: 'PATCH', body: JSON.stringify({ sha: c.sha }) });
+    const after = await gh('/contents/cards.json?ref=' + BRANCH);
+    A.sha = after.sha;
+    Object.keys(PENDING).forEach(k => delete PENDING[k]); REMOVED.clear(); A.dirty = 0;
+    A.msg = `Опубликовано, версия ${A.cat.version}. Игра обновится через 1–2 минуты: закройте её на телефоне и откройте снова.`;
+  } catch (e) { A.err = e.message; A.msg = ''; }
+  A.busy = false; render();
+}
+function usedPaths() { const s = new Set(); A.cat.cards.forEach(c => { if (c.img) s.add(c.img); }); return s; }
+function validate() {
+  const out = [];
+  A.cat.series.forEach(s => { if (!s.name.trim()) out.push('У коллекции нет названия.'); });
+  A.cat.cards.forEach(c => { if (!c.name.trim()) out.push(`У карточки в коллекции «${serName(c.series)}» нет названия.`); });
+  if (!A.cat.series.some(s => s.starter && s.active !== false)) out.push('Нужна хотя бы одна коллекция для стартового набора.');
+  return [...new Set(out)];
+}
+const serName = id => id === 'x' ? 'Особые' : ((A.cat.series.find(s => s.id === id) || {}).name || id);
+const uid = () => Date.now().toString(36) + rnd(1296).toString(36);
+function touch() { A.dirty++; A.msg = ''; A.err = ''; }
+
+/* ---------- images ---------- */
+async function processImage(file, cardId, fit) {
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type)) throw new Error('Нужен файл PNG, JPG или WebP.');
+  if (file.size > MAX_FILE) throw new Error('Файл больше 15 МБ. Уменьшите его перед загрузкой.');
+  const bmp = await createImageBitmap(file);
+  const warn = bmp.width < MIN_W || bmp.height < MIN_H ? `Картинка ${bmp.width}×${bmp.height}: меньше рекомендуемых ${MIN_W}×${MIN_H}, на больших экранах может быть мутной.` : '';
+  const cv = document.createElement('canvas'); cv.width = ART_W; cv.height = ART_H;
+  const g = cv.getContext('2d');
+  const sc = fit === 'cover' ? Math.max(ART_W / bmp.width, ART_H / bmp.height) : Math.min(ART_W / bmp.width, ART_H / bmp.height);
+  const w = bmp.width * sc, h = bmp.height * sc;
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(bmp, (ART_W - w) / 2, (ART_H - h) / 2, w, h);
+  let blob = await new Promise(r => cv.toBlob(r, 'image/webp', .86));
+  if (!blob || blob.type !== 'image/webp') blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  const ext = blob.type === 'image/webp' ? 'webp' : 'png';
+  const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(blob); });
+  const path = `cards/${cardId}-${uid()}.${ext}`;
+  PENDING[path] = { b64, url: URL.createObjectURL(blob), kb: Math.round(blob.size / 1024) };
+  return { path, warn, kb: Math.round(blob.size / 1024) };
+}
+function setImage(card, path) {
+  if (card.img) { if (PENDING[card.img]) delete PENDING[card.img]; else if (card.img.startsWith('cards/')) REMOVED.add(card.img); }
+  card.img = path;
+}
+
+/* ---------- views ---------- */
+function preview(c) {
+  applyCat(A.cat);
+  if (CARDS[c.id] && c.img && PENDING[c.img]) CARDS[c.id].img = PENDING[c.img].url;
+  return mc(c.id, { big: true });
+}
+function cardEditor(c) {
+  const lim = c.tier === 'limited';
+  return `<div class="ced" id="ced-${c.id}">
+    <div class="ced-prev">${preview(c)}</div>
+    <div class="ced-form">
+      <div class="row between"><b>${c.tier === 'common' ? '№ ' + c.no : ({ rare: 'Редкая', ultra: 'Ультраредкая', limited: 'Лимитированная' })[c.tier]}</b>
+        <span class="muted">${c.img ? (PENDING[c.img] ? `новая картинка, ${PENDING[c.img].kb} КБ` : 'картинка загружена') : c.art ? 'временный рисунок' : 'нет картинки'}</span></div>
+      <label>Название <span class="muted">(до 22 знаков)</span><input type="text" maxlength="22" value="${esc(c.name)}" data-f="name" data-id="${c.id}"></label>
+      <label>Факт или описание <span class="muted">(до 110 знаков)</span><textarea maxlength="110" rows="3" data-f="fact" data-id="${c.id}">${esc(c.fact || '')}</textarea></label>
+      ${lim ? `<label>Номер выпуска <span class="muted">(например, №17/100)</span><input type="text" maxlength="12" value="${esc(c.edition || '')}" data-f="edition" data-id="${c.id}"></label>` : ''}
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <label class="upl">Загрузить картинку<input type="file" accept="image/png,image/jpeg,image/webp" data-up="${c.id}"></label>
+        <select data-fit="${c.id}" aria-label="Как поместить картинку"><option value="contain">вписать целиком</option><option value="cover">заполнить и обрезать</option></select>
+        ${c.img ? `<button class="sbtn" data-act="noimg" data-id="${c.id}">Убрать картинку</button>` : ''}
+        ${c.tier === 'common' ? `<button class="sbtn" data-act="up" data-id="${c.id}" aria-label="Выше">↑</button><button class="sbtn" data-act="down" data-id="${c.id}" aria-label="Ниже">↓</button>` : ''}
+        ${c.id !== 'ux' ? `<button class="sbtn danger" data-act="delcard" data-id="${c.id}">Удалить</button>` : ''}
+      </div>
+      <p class="warn" id="warn-${c.id}"></p>
+    </div></div>`;
+}
+function vSeries(s) {
+  const commons = A.cat.cards.filter(c => c.series === s.id && c.tier === 'common').sort((a, b) => a.no - b.no);
+  const rare = A.cat.cards.find(c => c.series === s.id && c.tier === 'rare');
+  return `<div class="patch stack">
+      <div class="sgrid">
+        <label>Название коллекции<input type="text" maxlength="20" value="${esc(s.name)}" data-sf="name" data-sid="${s.id}"></label>
+        <label>Цвет плашки<input type="color" value="${esc(s.color)}" data-sf="color" data-sid="${s.id}"></label>
+      </div>
+      <div class="row" style="gap:16px;flex-wrap:wrap">
+        <label class="chk"><input type="checkbox" ${s.active !== false ? 'checked' : ''} data-sf="active" data-sid="${s.id}"> Показывать в игре</label>
+        <label class="chk"><input type="checkbox" ${s.starter ? 'checked' : ''} data-sf="starter" data-sid="${s.id}"> Можно взять как стартовый набор</label>
+      </div>
+      <p class="muted">В альбоме ${commons.length} мест. Собравший все получает редкую карточку коллекции. Скрытая коллекция пропадает из игры, но карточки у игроков сохраняются и вернутся, если коллекцию снова показать.</p>
+    </div>
+    <h2>Обычные карточки: ${commons.length}</h2>
+    <div class="ceds">${commons.map(cardEditor).join('')}</div>
+    <button class="btn ghost" data-act="addcard" data-sid="${s.id}">+ Добавить карточку</button>
+    <h2>Редкая карточка коллекции</h2>
+    ${rare ? `<div class="ceds">${cardEditor(rare)}</div>` : `<button class="btn ghost" data-act="addrare" data-sid="${s.id}">+ Создать редкую карточку</button>`}
+    <div class="patch stack"><button class="sbtn danger" data-act="delser" data-sid="${s.id}">Удалить коллекцию целиком</button>
+      <p class="muted">Удаление стирает и карточки у игроков. Чтобы убрать коллекцию на время, снимите «Показывать в игре».</p></div>`;
+}
+function vSpecial() {
+  const sp = A.cat.cards.filter(c => c.series === 'x');
+  return `<div class="patch stack"><label>Сколько редких из разных коллекций нужно для ультраредкой
+      <input type="number" min="1" max="20" value="${A.cat.ultraNeeds || 3}" data-cf="ultraNeeds"></label></div>
+    <div class="ceds">${sp.map(cardEditor).join('')}</div>
+    <button class="btn ghost" data-act="addlim">+ Лимитированная карточка</button>
+    <p class="muted">Лимитированные карточки пока видны в каталоге, но выдавать их игрокам игра ещё не умеет: это следующий шаг.</p>`;
+}
+function vSpecs() {
+  return `<div class="patch stack spec">
+    <h2>Требования к картинке карточки</h2>
+    <p>Вы рисуете только <b>иллюстрацию</b>. Рамку, цветную плашку, номер, название и факт игра рисует сама, поэтому текст на картинку не добавляйте.</p>
+    <table>
+      <tr><th>Пропорции</th><td>10 : 7, горизонтальная</td></tr>
+      <tr><th>Размер исходника</th><td>лучше 2000 × 1400 px, минимум 1000 × 700 px</td></tr>
+      <tr><th>Формат</th><td>PNG (лучше с прозрачным фоном), JPG или WebP, до 15 МБ</td></tr>
+      <tr><th>Фон</th><td>прозрачный или светлый однотонный; в карточке он ложится на белое поле</td></tr>
+      <tr><th>Безопасная зона</th><td>главное держите в центре, оставляйте 6–8% поля по краям: углы скругляются, а на маленьких карточках края теряются</td></tr>
+      <tr><th>Читаемость</th><td>карточка в альбоме бывает размером с ноготь, около 60 px в ширину: силуэт должен угадываться и там</td></tr>
+      <tr><th>Стиль</th><td>один стиль на всю коллекцию: одинаковая толщина контура, похожая палитра, один ракурс</td></tr>
+      <tr><th>Название</th><td>до 22 знаков</td></tr>
+      <tr><th>Факт</th><td>до 110 знаков, одна-две короткие фразы, проверенные факты</td></tr>
+    </table>
+    <h2>Что делает кабинет с картинкой</h2>
+    <p>Приводит её к ${ART_W} × ${ART_H} px и сжимает в WebP примерно до 100–200 КБ. Режим «вписать целиком» сохраняет весь рисунок и добавляет прозрачные поля, «заполнить и обрезать» обрезает лишнее по краям. Исходник у вас остаётся как есть: храните его, он пригодится для печати.</p>
+    <h2>Печать в будущем</h2>
+    <p>Для печатных вкладышей понадобится 300 dpi. Карточка 6 × 9 см — это 708 × 1063 px целиком, а иллюстрация на ней около 650 × 455 px. Исходник 2000 × 1400 закрывает это с большим запасом.</p>
+  </div>`;
+}
+function vToken() {
+  return `<div class="patch stack">
+    <h2>Подключение к GitHub</h2>
+    <p>Кабинет сохраняет карточки прямо в репозиторий игры. Для этого нужен личный ключ доступа (токен). Он хранится только в этом браузере.</p>
+    <ol class="steps">
+      <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a></li>
+      <li>Token name: <b>karmantsy-admin</b>, Expiration: на ваш выбор, например 1 год.</li>
+      <li>Repository access: <b>Only select repositories</b> → выберите <b>karmantsy</b>.</li>
+      <li>Permissions → Repository permissions → <b>Contents: Read and write</b>.</li>
+      <li>Нажмите <b>Generate token</b>, скопируйте его и вставьте сюда.</li>
+    </ol>
+    <label>Токен<input type="password" id="tok" value="${esc(TOKEN)}" autocomplete="off" placeholder="github_pat_…"></label>
+    <div class="row" style="gap:8px"><button class="btn" data-act="savetok" style="width:auto">Сохранить и загрузить каталог</button>
+      ${TOKEN ? '<button class="sbtn" data-act="forget">Забыть токен</button>' : ''}</div>
+  </div>`;
+}
+function render() {
+  const tabs = A.cat ? [...A.cat.series.map(s => ({ id: s.id, name: s.name + (s.active === false ? ' (скрыта)' : '') })), { id: 'x', name: 'Особые' }, { id: 'specs', name: 'Требования' }] : [];
+  let body = '';
+  if (A.showToken || !TOKEN) body = vToken() + vSpecs();
+  else if (!A.cat) body = `<div class="patch"><p>${A.busy ? 'Загружаю…' : 'Каталог не загружен.'}</p>${A.busy ? '' : '<button class="btn" data-act="reload" style="width:auto">Загрузить каталог</button>'}</div>`;
+  else {
+    const s = A.cat.series.find(x => x.id === A.tab);
+    body = `<div class="tabs">${tabs.map(t => `<button class="chip ${A.tab === t.id ? 'on' : ''}" data-act="tab" data-id="${t.id}">${esc(t.name)}</button>`).join('')}<button class="chip" data-act="addser">+ Коллекция</button></div>
+      ${A.tab === 'specs' ? vSpecs() : A.tab === 'x' ? vSpecial() : s ? vSeries(s) : vSpecs()}`;
+  }
+  const sticky = A.cat && !A.showToken ? `<div class="pub">
+      <span>${A.err ? `<b class="bad">${esc(A.err)}</b>` : A.msg ? esc(A.msg) : A.dirty ? `Несохранённых изменений: ${A.dirty}` : 'Изменений нет'}</span>
+      <span class="row" style="gap:8px"><button class="sbtn" data-act="reload" ${A.busy ? 'disabled' : ''}>Загрузить заново</button>
+      <button class="btn" data-act="publish" style="width:auto" ${A.busy || !A.dirty ? 'disabled' : ''}>Опубликовать в игре</button></span></div>`
+    : (A.err || A.msg ? `<div class="pub"><span>${A.err ? `<b class="bad">${esc(A.err)}</b>` : esc(A.msg)}</span></div>` : '');
+  const app = document.getElementById('app');
+  const f = document.activeElement, fid = f && f.dataset && (f.dataset.f || f.dataset.sf) ? [f.dataset.f || f.dataset.sf, f.dataset.id || f.dataset.sid] : null;
+  app.innerHTML = `<div class="row between"><h1>Кабинет карточек</h1><span class="row" style="gap:10px"><a href="./" class="muted">Открыть игру</a>${TOKEN && !A.showToken ? '<button class="sbtn" data-act="showtok">Токен</button>' : ''}</span></div>${body}${sticky}`;
+  if (fid) { const el = app.querySelector(`[data-${fid[0] === 'name' || fid[0] === 'fact' || fid[0] === 'edition' ? 'f' : 'sf'}="${fid[0]}"][data-${fid[0] === 'name' || fid[0] === 'fact' || fid[0] === 'edition' ? 'id' : 'sid'}="${fid[1]}"]`); if (el) el.focus(); }
+}
+
+/* ---------- actions ---------- */
+const byId = id => A.cat.cards.find(c => c.id === id);
+function renumber(sid) { A.cat.cards.filter(c => c.series === sid && c.tier === 'common').sort((a, b) => a.no - b.no).forEach((c, i) => { c.no = i + 1; }); }
+const app = document.getElementById('app');
+app.addEventListener('click', async e => {
+  const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+  const a = t.dataset.act;
+  if (a === 'savetok') { TOKEN = (document.getElementById('tok').value || '').trim(); try { localStorage.setItem('k2-admin-token', TOKEN); } catch (er) {} if (TOKEN) { A.showToken = false; loadCatalog(); } return; }
+  if (a === 'forget') { TOKEN = ''; try { localStorage.removeItem('k2-admin-token'); } catch (er) {} A.cat = null; A.showToken = true; render(); return; }
+  if (a === 'showtok') { A.showToken = true; render(); return; }
+  if (a === 'reload') { if (A.dirty && !window.confirm('Несохранённые изменения пропадут. Загрузить каталог заново?')) return; loadCatalog(); return; }
+  if (a === 'publish') { publish(); return; }
+  if (a === 'tab') { A.tab = t.dataset.id; render(); window.scrollTo(0, 0); return; }
+  if (a === 'addser') {
+    const id = 's' + uid();
+    A.cat.series.push({ id, name: 'Новая коллекция', color: '#7a4fb8', size: 0, active: false, starter: false });
+    for (let i = 1; i <= 10; i++) A.cat.cards.push({ id: id + '_' + i, series: id, tier: 'common', no: i, name: 'Карточка ' + i, fact: '', art: null, img: null });
+    A.cat.cards.push({ id: id + '_r', series: id, tier: 'rare', name: 'Редкая', fact: '', art: null, img: null });
+    A.tab = id; touch(); render(); return;
+  }
+  const id = t.dataset.id, sid = t.dataset.sid;
+  if (a === 'addcard') { const n = A.cat.cards.filter(c => c.series === sid && c.tier === 'common').length; A.cat.cards.push({ id: sid + '_' + uid(), series: sid, tier: 'common', no: n + 1, name: 'Карточка ' + (n + 1), fact: '', art: null, img: null }); touch(); render(); return; }
+  if (a === 'addrare') { A.cat.cards.push({ id: sid + '_r' + uid(), series: sid, tier: 'rare', name: 'Редкая', fact: '', art: null, img: null }); touch(); render(); return; }
+  if (a === 'addlim') { A.cat.cards.push({ id: 'lim_' + uid(), series: 'x', tier: 'limited', name: 'Лимитированная', fact: '', art: null, img: null, edition: '№1/100' }); touch(); render(); return; }
+  if (a === 'noimg') { const c = byId(id); setImage(c, null); touch(); render(); return; }
+  if (a === 'delcard') { const c = byId(id); if (!window.confirm(`Удалить карточку «${c.name}»? У игроков она пропадёт из кармана и альбома.`)) return; setImage(c, null); A.cat.cards = A.cat.cards.filter(x => x.id !== id); renumber(c.series); touch(); render(); return; }
+  if (a === 'up' || a === 'down') {
+    const c = byId(id), list = A.cat.cards.filter(x => x.series === c.series && x.tier === 'common').sort((p, q) => p.no - q.no), i = list.indexOf(c), j = a === 'up' ? i - 1 : i + 1;
+    if (j < 0 || j >= list.length) return; const tmp = list[j].no; list[j].no = c.no; c.no = tmp; touch(); render(); return;
+  }
+  if (a === 'delser') {
+    const s = A.cat.series.find(x => x.id === sid);
+    if (!window.confirm(`Удалить коллекцию «${s.name}» со всеми карточками? У игроков они пропадут.`)) return;
+    A.cat.cards.filter(c => c.series === sid).forEach(c => setImage(c, null));
+    A.cat.cards = A.cat.cards.filter(c => c.series !== sid); A.cat.series = A.cat.series.filter(x => x.id !== sid);
+    A.tab = A.cat.series[0] ? A.cat.series[0].id : 'specs'; touch(); render(); return;
+  }
+});
+app.addEventListener('input', e => {
+  const d = e.target.dataset || {};
+  if (d.f && d.id) { const c = byId(d.id); if (c) { c[d.f] = e.target.value; A.dirty++; const p = document.querySelector(`#ced-${CSS.escape(d.id)} .ced-prev`); if (p) p.innerHTML = preview(c); } }
+  if (d.sf && d.sid && e.target.type !== 'checkbox') { const s = A.cat.series.find(x => x.id === d.sid); if (s) { s[d.sf] = e.target.value; A.dirty++; if (d.sf === 'color') render(); } }
+  if (d.cf) { A.cat[d.cf] = Math.max(1, Math.min(20, parseInt(e.target.value, 10) || 3)); A.dirty++; }
+});
+app.addEventListener('change', async e => {
+  const d = e.target.dataset || {};
+  if (d.sf && e.target.type === 'checkbox') { const s = A.cat.series.find(x => x.id === d.sid); s[d.sf] = e.target.checked; touch(); render(); return; }
+  if (d.sf === 'name') { render(); return; }
+  if (d.up && e.target.files && e.target.files[0]) {
+    const c = byId(d.up), sel = document.querySelector(`[data-fit="${CSS.escape(d.up)}"]`), fit = sel ? sel.value : 'contain';
+    try {
+      const r = await processImage(e.target.files[0], c.id, fit);
+      setImage(c, r.path); touch(); render();
+      const w = document.getElementById('warn-' + c.id); if (w && r.warn) w.textContent = r.warn;
+    } catch (er) { const w = document.getElementById('warn-' + c.id); if (w) w.textContent = er.message || 'Не удалось прочитать картинку.'; }
+  }
+});
+window.addEventListener('beforeunload', e => { if (A.dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+applyCat(DEFAULT_CAT);
+render();
+if (TOKEN) loadCatalog();
+
+</script>
+</body>
+</html>
