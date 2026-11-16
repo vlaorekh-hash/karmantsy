@@ -365,6 +365,37 @@ body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inse
 .key, .rps-btn { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .opt .tag { flex: none; }
 .mc .art img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.mc.full { padding: 0; overflow: hidden; background: #fff; }
+.mc.full .fullimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+.mc.full .cnt, .mc.full .glued { z-index: 1; }
+.cback { position: absolute; inset: 0; border-radius: 7px; overflow: hidden; display: flex; padding: 9px; box-sizing: border-box; background-color: var(--bc);
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.07) 0 6px, transparent 6px 14px); box-shadow: 0 3px 0 rgba(0,0,0,.3); }
+.cback.img { padding: 0; background: #fff; }
+.cback.img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cb-in { flex: 1; border: 2px dashed #f2a93b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 10px; color: #f5ecd6; min-width: 0; }
+.cb-logo { font-family: var(--font-display); font-size: 24px; line-height: 1; } .cb-logo span { color: #f2a93b; }
+.cb-pocket { width: 64px; height: auto; }
+.cb-ser { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+.cb-name { font-family: var(--font-display); font-weight: 400; font-size: 15px; line-height: 1.15; }
+.cb-fact { font-size: 11px; line-height: 1.35; opacity: .95; }
+.cb-meta { font-size: 10px; font-weight: 700; opacity: .85; margin-top: 2px; }
+.viewer { position: fixed; inset: 0; z-index: 40; background: rgba(8, 14, 28, .96); color: var(--paper); display: flex; flex-direction: column; align-items: center;
+  padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); gap: 10px; font-family: var(--font-body); -webkit-user-select: none; user-select: none; }
+.vtop { width: 100%; max-width: 520px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 18px; }
+.vstage { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; perspective: 1400px; touch-action: none; cursor: grab; overflow: hidden; }
+.vcard { position: relative; width: 220px; height: 320px; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; will-change: transform; }
+.vcard.snap { transition: transform .45s cubic-bezier(.2, .8, .3, 1); }
+.vface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.vface .mc { width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.vback { transform: rotateY(180deg); }
+.vshine { position: absolute; inset: 0; border-radius: 7px; pointer-events: none; background: linear-gradient(var(--sa, 120deg), transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%); opacity: var(--so, .2); mix-blend-mode: screen; }
+.vcard.rare .vshine, .vcard.ultra .vshine, .vcard.limited .vshine { background: linear-gradient(var(--sa, 120deg), transparent 25%, rgba(255,236,160,.45) 42%, rgba(190,160,255,.35) 55%, transparent 72%); }
+.vhint { margin: 0; font-size: 13px; opacity: .7; text-align: center; }
+.vbar { display: flex; gap: 10px; width: 100%; max-width: 420px; }
+.vbtn { font: inherit; font-weight: 700; font-size: 16px; color: var(--paper); background: transparent; border: 2px solid var(--paper); border-radius: 10px; padding: 10px 14px; min-height: 44px; min-width: 44px; }
+.vbtn.wide { flex: 1; }
+.vbtn:focus-visible { outline: 3px solid var(--thread); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .vcard.snap { transition: none; } }
 
 #app { max-width: 1120px; }
 label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; opacity: 1; }
@@ -379,8 +410,20 @@ input[type=password] { font: inherit; font-size: 16px; padding: 12px; border-rad
 .tabs .chip.on { background: var(--thread); color: var(--ink); }
 .sgrid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
 .ceds { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr)); gap: 14px; }
-.ced { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; background: var(--denim); border: 2px solid var(--denim-light); border-radius: 12px; padding: 12px; }
-.ced-prev .mc { width: 150px; }
+.ced { display: grid; grid-template-columns: 246px minmax(0, 1fr); gap: 14px; background: var(--denim); border: 2px solid var(--denim-light); border-radius: 12px; padding: 12px; }
+.ced-prev { display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+.ced-prev > .sbtn { width: 100%; }
+.pv { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.pvb { position: relative; width: 118px; height: 172px; }
+.pvb > .mc, .pvb > .cback { position: absolute; left: 0; top: 0; width: 220px; height: 320px; inset: auto; transform: scale(.536); transform-origin: 0 0; }
+.serback { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 14px; align-items: start; }
+fieldset.side { border: 1px solid rgba(245,236,214,.22); border-radius: 8px; padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 8px; margin: 0; min-width: 0; }
+fieldset.side legend { font-weight: 700; padding: 0 4px; }
+.row.wrap { flex-wrap: wrap; gap: 8px; align-items: center; }
+.chk { align-items: flex-start; }
+.chk input { flex: none; margin-top: 1px; }
+.chk > span { flex: 1; min-width: 0; }
+.chk > span .muted { display: block; }
 .ced-form { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .sbtn { font: inherit; font-size: 14px; font-weight: 700; padding: 9px 12px; border-radius: 8px; border: 2px solid var(--paper); background: transparent; color: var(--paper); }
 .sbtn.danger { border-color: var(--hit); color: var(--hit); }
@@ -396,14 +439,14 @@ input[type=password] { font: inherit; font-size: 16px; padding: 12px; border-rad
 .spec p { max-width: 70ch; }
 .steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 a { color: var(--thread); }
-@media (max-width: 560px) { .ced { grid-template-columns: 1fr; } .ced-prev { display: flex; justify-content: center; } .sgrid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .ced { grid-template-columns: 1fr; } .ced-prev { justify-content: center; } .sgrid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
 const DEFAULT_CAT = {
- "version": 1,
+ "version": 2,
  "updated": "2026-11-16",
  "ultraNeeds": 3,
  "series": [
@@ -541,7 +584,7 @@ const DEFAULT_CAT = {
    "name": "Мейн-кун",
    "fact": "Один из самых крупных котов. На ушах кисточки, как у рыси.",
    "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#7a5228\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#a8763e\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#7a5228\"/><path d=\"M80 14 L78 2 M120 14 L122 2\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#a8763e\"/><path d=\"M100 22 L100 34 M90 24 L92 34 M110 24 L108 34\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M70 92 L90 90 M70 104 L92 102 M130 92 L110 90 M130 104 L108 102\" stroke=\"#7a5228\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/>",
-   "img": null
+   "img": "cards/c1-mwjavfbvop.webp"
   },
   {
    "id": "c2",
@@ -781,7 +824,8 @@ const DEFAULT_CAT = {
    "edition": "№17/100"
   }
  ]
-};
+}
+;
 const COLORS = ['#f26b4e', '#f2c14e', '#6fcf97', '#b58df1', '#5ec4e8'];
 const NAMES = ['Фантик', 'Пуговка', 'Шнурок', 'Крошка', 'Жвачка', 'Скрепка'];
 const ROLES = [
@@ -813,7 +857,8 @@ function applyCat(cat) {
   SER.x = { id: 'x', name: 'Все серии', color: '#b58df1', active: true };
   (cat.cards || []).forEach(c => {
     const sr = SER[c.series]; if (!sr) return;
-    CARDS[c.id] = { id: c.id, s: c.series, ser: c.tier === 'limited' ? 'Выпуск мастера' : sr.name, no: c.no, name: c.name, fact: c.fact || '', art: c.art, img: c.img, tier: c.tier, edition: c.edition, color: sr.color, active: sr.active !== false };
+    CARDS[c.id] = { id: c.id, s: c.series, ser: c.tier === 'limited' ? 'Выпуск мастера' : sr.name, no: c.no, name: c.name, fact: c.fact || '', art: c.art, img: c.img, tier: c.tier, edition: c.edition, color: sr.color, active: sr.active !== false,
+      front: c.front === 'full' && c.full ? 'full' : 'art', full: c.full || null, back: c.back || null, serBack: sr.back || null };
     if (c.tier === 'rare') RARE_OF[c.series] = c.id;
   });
 }
@@ -894,8 +939,27 @@ function mc(id, o) {
     <span class="art">${cardArt(c)}</span>
     <span class="nm">${esc(c.name)}</span>${o.big ? `<span class="fact">${esc(c.fact)}</span>` : ''}
     ${o.count > 1 ? `<span class="cnt">×${o.count}</span>` : ''}${o.glued ? '<span class="glued">в альбоме</span>' : ''}${o.need ? '<span class="glued" style="background:var(--thread)">нужна</span>' : ''}`;
-  const cls = `mc ${c.tier} ${o.big ? 'big' : ''} ${o.sel ? 'sel' : ''} ${o.gone ? 'gone' : ''}`;
-  return o.act ? `<button class="${cls}" data-act="${o.act}" data-id="${id}" ${o.side ? `data-p="${o.side}"` : ''} aria-label="${esc(c.name)}" aria-pressed="${!!o.sel}">${inner}</button>` : `<div class="${cls}">${inner}</div>`;
+  const badges = `${o.count > 1 ? `<span class="cnt">×${o.count}</span>` : ''}${o.glued ? '<span class="glued">в альбоме</span>' : ''}${o.need ? '<span class="glued" style="background:var(--thread)">нужна</span>' : ''}`;
+  const body = c.front === 'full' ? `<img class="fullimg" src="${esc(c.full)}" alt="" loading="lazy" decoding="async">${badges}` : inner;
+  const cls = `mc ${c.tier} ${c.front === 'full' ? 'full' : ''} ${o.big ? 'big' : ''} ${o.sel ? 'sel' : ''} ${o.gone ? 'gone' : ''}`;
+  return o.act ? `<button class="${cls}" data-act="${o.act}" data-id="${id}" ${o.side ? `data-p="${o.side}"` : ''} aria-label="${esc(c.name)}" aria-pressed="${!!o.sel}">${body}</button>` : `<div class="${cls}">${body}</div>`;
+}
+function cardBack(id) {
+  const c = CARDS[id]; if (!c) return '';
+  const img = c.back || c.serBack;
+  if (img) return `<div class="cback img"><img src="${esc(img)}" alt="" decoding="async"></div>`;
+  const tier = ({ common: 'Обычная', rare: 'Редкая', ultra: 'Ультраредкая', limited: 'Лимитированная' })[c.tier];
+  const num = c.tier === 'common' ? `№${c.no} из ${serSize(c.s)}` : c.tier === 'limited' ? (c.edition || '') : '';
+  const col = ({ rare: '#c9971c', ultra: '#7d5bc4', limited: '#14213a' })[c.tier] || c.color;
+  return `<div class="cback" style="--bc:${esc(col)}">
+    <div class="cb-in">
+      <span class="cb-logo">Карман<span>цы</span></span>
+      <svg class="cb-pocket" viewBox="0 0 100 110" aria-hidden="true"><path d="M6 6 H94 V72 L50 104 L6 72Z" fill="rgba(255,255,255,.16)"/><path d="M13 13 H87 V68 L50 95 L13 68Z" fill="none" stroke="#f2a93b" stroke-width="2.5" stroke-dasharray="6 5"/><circle cx="13" cy="13" r="4" fill="#d9824a"/><circle cx="87" cy="13" r="4" fill="#d9824a"/></svg>
+      <span class="cb-ser">${esc(c.ser)}</span>
+      <b class="cb-name">${esc(c.name)}</b>
+      ${c.fact ? `<span class="cb-fact">${esc(c.fact)}</span>` : ''}
+      <span class="cb-meta">${num ? num + ' · ' : ''}${tier}</span>
+    </div></div>`;
 }
 function mathTask(l) {
   let a, b;
@@ -903,7 +967,89 @@ function mathTask(l) {
   if (l === 2) { a = 11 + rnd(49); b = 11 + rnd(29); return Math.random() < .5 ? { text: `${a} + ${b}`, ans: a + b } : { text: `${a + b} − ${b}`, ans: a }; }
   if (l === 3) { a = 2 + rnd(8); b = 2 + rnd(8); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${a}`, ans: b }; }
   a = 12 + rnd(38); b = 3 + rnd(5); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${b}`, ans: a };
+}/* ---------- card viewer: full screen, both sides, rotate with a finger ---------- */
+let VWR = null;
+function openViewer(id) {
+  if (!CARDS[id]) return;
+  closeViewer();
+  const c = CARDS[id];
+  const el = document.createElement('div');
+  el.className = 'viewer'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Карточка ' + c.name);
+  el.innerHTML = `<div class="vtop"><b>${esc(c.name)}</b><button class="vbtn" data-v="close" aria-label="Закрыть">✕</button></div>
+    <div class="vstage"><div class="vcard ${c.tier}">
+      <div class="vface vfront">${mc(id, { big: true })}<span class="vshine"></span></div>
+      <div class="vface vback">${cardBack(id)}<span class="vshine"></span></div>
+    </div></div>
+    <p class="vhint">Крути карточку пальцем. Двойной тап или щипок — приблизить.</p>
+    <div class="vbar"><button class="vbtn wide" data-v="flip">Перевернуть</button><button class="vbtn wide" data-v="zoom">Крупнее</button></div>`;
+  document.body.appendChild(el);
+  document.body.style.overflow = 'hidden';
+  const card = el.querySelector('.vcard'), stage = el.querySelector('.vstage');
+  const V = VWR = { el, card, ry: -25, rx: 8, zoom: 1, fit: 1, pts: new Map(), last: null, vel: 0, tapAt: 0, pinch: null, moved: 0 };
+  const fit = () => { V.fit = Math.max(.6, Math.min((window.innerWidth - 40) / 220, (window.innerHeight - 220) / 320, 2.4)); };
+  const draw = () => {
+    card.style.transform = `scale(${(V.fit * V.zoom).toFixed(3)}) rotateX(${V.rx.toFixed(1)}deg) rotateY(${V.ry.toFixed(1)}deg)`;
+    const a = ((V.ry % 360) + 360) % 360;
+    el.style.setProperty('--sa', (100 + a * .6).toFixed(0) + 'deg');
+    el.style.setProperty('--so', (Math.abs(Math.sin(V.ry * Math.PI / 180)) * .7 + .1).toFixed(2));
+    el.querySelector('[data-v=zoom]').textContent = V.zoom > 1.05 ? 'Мельче' : 'Крупнее';
+  };
+  const snap = (extra) => {
+    card.classList.add('snap');
+    V.ry = Math.round((V.ry + (extra || 0)) / 180) * 180; V.rx = 0; draw();
+    clearTimeout(V.st); V.st = setTimeout(() => card.classList.remove('snap'), 480);
+  };
+  const setZoom = z => { V.zoom = Math.max(1, Math.min(2.6, z)); card.classList.add('snap'); draw(); clearTimeout(V.st); V.st = setTimeout(() => card.classList.remove('snap'), 480); };
+  fit(); draw(); requestAnimationFrame(() => snap());
+  V.onResize = () => { fit(); draw(); };
+  window.addEventListener('resize', V.onResize);
+  V.onKey = e => { if (e.key === 'Escape') closeViewer(); if (e.key === 'ArrowLeft') snap(-180); if (e.key === 'ArrowRight') snap(180); };
+  document.addEventListener('keydown', V.onKey);
+  el.addEventListener('click', e => {
+    const b = e.target.closest('[data-v]'); if (!b) { if (e.target === el) closeViewer(); return; }
+    if (b.dataset.v === 'close') closeViewer();
+    if (b.dataset.v === 'flip') snap(180);
+    if (b.dataset.v === 'zoom') setZoom(V.zoom > 1.05 ? 1 : 1.8);
+  });
+  stage.addEventListener('pointerdown', e => {
+    e.preventDefault(); stage.setPointerCapture && stage.setPointerCapture(e.pointerId);
+    V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    card.classList.remove('snap');
+    if (V.pts.size === 2) { const [p, q] = [...V.pts.values()]; V.pinch = { d: Math.hypot(p.x - q.x, p.y - q.y), z: V.zoom }; }
+    else { V.last = { x: e.clientX, y: e.clientY, t: performance.now() }; V.vel = 0; V.moved = 0; }
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!V.pts.has(e.pointerId)) return;
+    V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (V.pts.size >= 2 && V.pinch) { const [p, q] = [...V.pts.values()]; V.zoom = Math.max(1, Math.min(2.6, V.pinch.z * Math.hypot(p.x - q.x, p.y - q.y) / (V.pinch.d || 1))); draw(); return; }
+    if (!V.last) return;
+    const now = performance.now(), dx = e.clientX - V.last.x, dy = e.clientY - V.last.y;
+    V.ry += dx * .55; V.rx = Math.max(-35, Math.min(35, V.rx - dy * .35));
+    V.vel = dx * .55 / Math.max(8, now - V.last.t);
+    V.moved += Math.abs(dx) + Math.abs(dy);
+    V.last = { x: e.clientX, y: e.clientY, t: now }; draw();
+  });
+  const up = e => {
+    if (!V.pts.has(e.pointerId)) return;
+    V.pts.delete(e.pointerId);
+    if (V.pts.size === 1) { const p = [...V.pts.values()][0]; V.last = { x: p.x, y: p.y, t: performance.now() }; V.pinch = null; return; }
+    if (V.pts.size) return;
+    V.pinch = null;
+    const now = performance.now();
+    if (V.moved < 8) { if (now - V.tapAt < 320) { setZoom(V.zoom > 1.05 ? 1 : 1.8); V.tapAt = 0; return; } V.tapAt = now; }
+    snap(Math.max(-180, Math.min(180, V.vel * 220)));
+    V.last = null;
+  };
+  stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+  stage.addEventListener('wheel', e => { e.preventDefault(); setZoom(V.zoom * (e.deltaY < 0 ? 1.12 : .89)); }, { passive: false });
+  el.querySelector('[data-v=flip]').focus();
 }
+function closeViewer() {
+  if (!VWR) return;
+  window.removeEventListener('resize', VWR.onResize); document.removeEventListener('keydown', VWR.onKey);
+  VWR.el.remove(); VWR = null; document.body.style.overflow = '';
+}
+
 /* ================= Кабинет карточек =================
    Edits cards.json and card illustrations in the GitHub repository that hosts the game.
    Everything is published in one commit through the GitHub API with a personal token
@@ -911,6 +1057,8 @@ function mathTask(l) {
 
 const REPO = 'vlaorekh-hash/karmantsy', BRANCH = 'main', API = 'https://api.github.com/repos/' + REPO;
 const ART_W = 1000, ART_H = 700;          // stored illustration size (10:7)
+const FULL_W = 1100, FULL_H = 1600;       // stored whole card or back side (11:16)
+const KIND = { art: { w: ART_W, h: ART_H, minW: 1000, minH: 700, q: .86 }, full: { w: FULL_W, h: FULL_H, minW: 1100, minH: 1600, q: .9 } };
 const MIN_W = 1000, MIN_H = 700;          // smallest source we accept without a warning
 const MAX_FILE = 15 * 1024 * 1024;
 
@@ -962,7 +1110,8 @@ async function publish() {
     REMOVED.forEach(p => { if (!usedPaths().has(p) && !PENDING[p]) tree.push({ path: p, mode: '100644', type: 'blob', sha: null }); });
     A.cat.version = (A.cat.version || 1) + 1; A.cat.updated = new Date().toISOString().slice(0, 10);
     A.cat.series.forEach(s => { s.size = A.cat.cards.filter(c => c.series === s.id && c.tier === 'common').length; });
-    const json = JSON.stringify(A.cat, null, 1) + '\n';
+    A.cat.cards.forEach(c => { if (c.backMode && !c.back) delete c.backMode; });
+    const json = JSON.stringify(A.cat, (k, v) => k === 'backMode' ? undefined : v, 1) + '\n';
     const jb = await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: json, encoding: 'utf-8' }) });
     tree.push({ path: 'cards.json', mode: '100644', type: 'blob', sha: jb.sha });
     A.msg = 'Сохраняю…'; render();
@@ -976,7 +1125,7 @@ async function publish() {
   } catch (e) { A.err = e.message; A.msg = ''; }
   A.busy = false; render();
 }
-function usedPaths() { const s = new Set(); A.cat.cards.forEach(c => { if (c.img) s.add(c.img); }); return s; }
+function usedPaths() { const s = new Set(); A.cat.cards.forEach(c => ['img', 'full', 'back'].forEach(f => { if (c[f]) s.add(c[f]); })); A.cat.series.forEach(x => { if (x.back) s.add(x.back); }); return s; }
 function validate() {
   const out = [];
   A.cat.series.forEach(s => { if (!s.name.trim()) out.push('У коллекции нет названия.'); });
@@ -989,53 +1138,74 @@ const uid = () => Date.now().toString(36) + rnd(1296).toString(36);
 function touch() { A.dirty++; A.msg = ''; A.err = ''; }
 
 /* ---------- images ---------- */
-async function processImage(file, cardId, fit) {
+async function processImage(file, ownerId, fit, kind, tag) {
+  const K = KIND[kind || 'art'];
   if (!/^image\/(png|jpeg|webp)$/.test(file.type)) throw new Error('Нужен файл PNG, JPG или WebP.');
   if (file.size > MAX_FILE) throw new Error('Файл больше 15 МБ. Уменьшите его перед загрузкой.');
   const bmp = await createImageBitmap(file);
-  const warn = bmp.width < MIN_W || bmp.height < MIN_H ? `Картинка ${bmp.width}×${bmp.height}: меньше рекомендуемых ${MIN_W}×${MIN_H}, на больших экранах может быть мутной.` : '';
-  const cv = document.createElement('canvas'); cv.width = ART_W; cv.height = ART_H;
+  const warns = [];
+  if (bmp.width < K.minW || bmp.height < K.minH) warns.push(`Картинка ${bmp.width}×${bmp.height}: меньше рекомендуемых ${K.minW}×${K.minH}, может быть мутной.`);
+  const ratio = bmp.width / bmp.height, want = K.w / K.h;
+  if (Math.abs(ratio - want) / want > .03) warns.push(fit === 'cover' ? 'Пропорции отличаются от нужных: края обрезаны.' : 'Пропорции отличаются от нужных: по краям добавлены прозрачные поля.');
+  const cv = document.createElement('canvas'); cv.width = K.w; cv.height = K.h;
   const g = cv.getContext('2d');
-  const sc = fit === 'cover' ? Math.max(ART_W / bmp.width, ART_H / bmp.height) : Math.min(ART_W / bmp.width, ART_H / bmp.height);
+  const sc = fit === 'cover' ? Math.max(K.w / bmp.width, K.h / bmp.height) : Math.min(K.w / bmp.width, K.h / bmp.height);
   const w = bmp.width * sc, h = bmp.height * sc;
   g.imageSmoothingQuality = 'high';
-  g.drawImage(bmp, (ART_W - w) / 2, (ART_H - h) / 2, w, h);
-  let blob = await new Promise(r => cv.toBlob(r, 'image/webp', .86));
+  g.drawImage(bmp, (K.w - w) / 2, (K.h - h) / 2, w, h);
+  let blob = await new Promise(r => cv.toBlob(r, 'image/webp', K.q));
   if (!blob || blob.type !== 'image/webp') blob = await new Promise(r => cv.toBlob(r, 'image/png'));
   const ext = blob.type === 'image/webp' ? 'webp' : 'png';
   const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(blob); });
-  const path = `cards/${cardId}-${uid()}.${ext}`;
+  const path = `cards/${ownerId}-${tag || kind}-${uid()}.${ext}`;
   PENDING[path] = { b64, url: URL.createObjectURL(blob), kb: Math.round(blob.size / 1024) };
-  return { path, warn, kb: Math.round(blob.size / 1024) };
+  return { path, warn: warns.join(' '), kb: Math.round(blob.size / 1024) };
 }
-function setImage(card, path) {
-  if (card.img) { if (PENDING[card.img]) delete PENDING[card.img]; else if (card.img.startsWith('cards/')) REMOVED.add(card.img); }
-  card.img = path;
+function setImage(obj, path, field) {
+  field = field || 'img';
+  const old = obj[field];
+  if (old) { if (PENDING[old]) delete PENDING[old]; else if (old.startsWith('cards/')) REMOVED.add(old); }
+  obj[field] = path;
 }
+function clearAllImages(card) { ['img', 'full', 'back'].forEach(f => setImage(card, null, f)); }
 
 /* ---------- views ---------- */
-function preview(c) {
+function prepCards() {
   applyCat(A.cat);
-  if (CARDS[c.id] && c.img && PENDING[c.img]) CARDS[c.id].img = PENDING[c.img].url;
-  return mc(c.id, { big: true });
+  const u = p => p && PENDING[p] ? PENDING[p].url : p;
+  Object.values(CARDS).forEach(k => { k.img = u(k.img); k.full = u(k.full); k.back = u(k.back); k.serBack = u(k.serBack); });
 }
+function preview(c) {
+  prepCards();
+  return `<div class="pv"><div class="pvb">${mc(c.id, { big: true })}</div><span class="muted">лицо</span></div><div class="pv"><div class="pvb">${cardBack(c.id)}</div><span class="muted">оборот</span></div>`;
+}
+function imgState(p) { return p ? (PENDING[p] ? `новая, ${PENDING[p].kb} КБ` : 'загружена') : 'нет'; }
 function cardEditor(c) {
-  const lim = c.tier === 'limited';
+  const lim = c.tier === 'limited', full = c.front === 'full', ownBack = !!c.back || c.backMode === 'own';
   return `<div class="ced" id="ced-${c.id}">
-    <div class="ced-prev">${preview(c)}</div>
+    <div class="ced-prev">${preview(c)}<button class="sbtn" data-act="look" data-id="${c.id}">Рассмотреть в 3D</button></div>
     <div class="ced-form">
       <div class="row between"><b>${c.tier === 'common' ? '№ ' + c.no : ({ rare: 'Редкая', ultra: 'Ультраредкая', limited: 'Лимитированная' })[c.tier]}</b>
-        <span class="muted">${c.img ? (PENDING[c.img] ? `новая картинка, ${PENDING[c.img].kb} КБ` : 'картинка загружена') : c.art ? 'временный рисунок' : 'нет картинки'}</span></div>
+        ${c.tier === 'common' ? `<span class="row" style="gap:6px"><button class="sbtn" data-act="up" data-id="${c.id}" aria-label="Выше">↑</button><button class="sbtn" data-act="down" data-id="${c.id}" aria-label="Ниже">↓</button></span>` : ''}</div>
       <label>Название <span class="muted">(до 22 знаков)</span><input type="text" maxlength="22" value="${esc(c.name)}" data-f="name" data-id="${c.id}"></label>
-      <label>Факт или описание <span class="muted">(до 110 знаков)</span><textarea maxlength="110" rows="3" data-f="fact" data-id="${c.id}">${esc(c.fact || '')}</textarea></label>
+      <label>Факт или описание <span class="muted">(до 110 знаков, печатается на обороте${full ? '' : ' и на лице'})</span><textarea maxlength="110" rows="3" data-f="fact" data-id="${c.id}">${esc(c.fact || '')}</textarea></label>
       ${lim ? `<label>Номер выпуска <span class="muted">(например, №17/100)</span><input type="text" maxlength="12" value="${esc(c.edition || '')}" data-f="edition" data-id="${c.id}"></label>` : ''}
-      <div class="row" style="gap:8px;flex-wrap:wrap">
-        <label class="upl">Загрузить картинку<input type="file" accept="image/png,image/jpeg,image/webp" data-up="${c.id}"></label>
-        <select data-fit="${c.id}" aria-label="Как поместить картинку"><option value="contain">вписать целиком</option><option value="cover">заполнить и обрезать</option></select>
-        ${c.img ? `<button class="sbtn" data-act="noimg" data-id="${c.id}">Убрать картинку</button>` : ''}
-        ${c.tier === 'common' ? `<button class="sbtn" data-act="up" data-id="${c.id}" aria-label="Выше">↑</button><button class="sbtn" data-act="down" data-id="${c.id}" aria-label="Ниже">↓</button>` : ''}
-        ${c.id !== 'ux' ? `<button class="sbtn danger" data-act="delcard" data-id="${c.id}">Удалить</button>` : ''}
-      </div>
+      <fieldset class="side"><legend>Лицевая сторона</legend>
+        <label class="chk"><input type="radio" name="fr-${c.id}" value="art" ${full ? '' : 'checked'} data-mode="front" data-id="${c.id}"><span>Иллюстрация в рамке игры <span class="muted">(рамку, номер, название рисует игра)</span></span></label>
+        <label class="chk"><input type="radio" name="fr-${c.id}" value="full" ${full ? 'checked' : ''} data-mode="front" data-id="${c.id}"><span>Карточка целиком <span class="muted">(ваша картинка без изменений)</span></span></label>
+        ${full ? `<div class="row wrap"><label class="upl">Загрузить карточку целиком<input type="file" accept="image/png,image/jpeg,image/webp" data-up="${c.id}" data-kind="full" data-field="full"></label>
+            <span class="muted">${FULL_W}×${FULL_H}: ${imgState(c.full)}</span>${c.full ? `<button class="sbtn" data-act="noimg" data-id="${c.id}" data-field="full">Убрать</button>` : ''}</div>`
+          : `<div class="row wrap"><label class="upl">Загрузить иллюстрацию<input type="file" accept="image/png,image/jpeg,image/webp" data-up="${c.id}" data-kind="art" data-field="img"></label>
+            <select data-fit="${c.id}" aria-label="Как поместить иллюстрацию"><option value="contain">вписать целиком</option><option value="cover">заполнить и обрезать</option></select>
+            <span class="muted">${ART_W}×${ART_H}: ${c.img ? imgState(c.img) : c.art ? 'временный рисунок' : 'нет'}</span>${c.img ? `<button class="sbtn" data-act="noimg" data-id="${c.id}" data-field="img">Убрать</button>` : ''}</div>`}
+      </fieldset>
+      <fieldset class="side"><legend>Оборотная сторона</legend>
+        <label class="chk"><input type="radio" name="bk-${c.id}" value="series" ${ownBack ? '' : 'checked'} data-mode="back" data-id="${c.id}"><span>Рубашка коллекции <span class="muted">(общая для всех карточек коллекции)</span></span></label>
+        <label class="chk"><input type="radio" name="bk-${c.id}" value="own" ${ownBack ? 'checked' : ''} data-mode="back" data-id="${c.id}"><span>Своя оборотная сторона</span></label>
+        ${ownBack ? `<div class="row wrap"><label class="upl">Загрузить оборот<input type="file" accept="image/png,image/jpeg,image/webp" data-up="${c.id}" data-kind="full" data-field="back"></label>
+          <span class="muted">${FULL_W}×${FULL_H}: ${imgState(c.back)}</span>${c.back ? `<button class="sbtn" data-act="noimg" data-id="${c.id}" data-field="back">Убрать</button>` : ''}</div>` : ''}
+      </fieldset>
+      <div class="row wrap">${c.id !== 'ux' ? `<button class="sbtn danger" data-act="delcard" data-id="${c.id}">Удалить карточку</button>` : ''}</div>
       <p class="warn" id="warn-${c.id}"></p>
     </div></div>`;
 }
@@ -1051,6 +1221,12 @@ function vSeries(s) {
         <label class="chk"><input type="checkbox" ${s.active !== false ? 'checked' : ''} data-sf="active" data-sid="${s.id}"> Показывать в игре</label>
         <label class="chk"><input type="checkbox" ${s.starter ? 'checked' : ''} data-sf="starter" data-sid="${s.id}"> Можно взять как стартовый набор</label>
       </div>
+      <div class="serback"><div class="pvb">${(prepCards(), commons[0] ? cardBack(commons[0].id) : '')}</div>
+        <div class="stack" style="gap:8px"><b>Рубашка коллекции</b>
+          <span class="muted">Общий оборот для карточек этой коллекции. Без картинки игра рисует оборот сама: логотип, название, факт и номер.</span>
+          <div class="row wrap"><label class="upl">Загрузить рубашку<input type="file" accept="image/png,image/jpeg,image/webp" data-upser="${s.id}"></label>
+            <span class="muted">${FULL_W}×${FULL_H}: ${imgState(s.back)}</span>${s.back ? `<button class="sbtn" data-act="noserback" data-sid="${s.id}">Убрать</button>` : ''}</div>
+          <p class="warn" id="warn-ser-${s.id}"></p></div></div>
       <p class="muted">В альбоме ${commons.length} мест. Собравший все получает редкую карточку коллекции. Скрытая коллекция пропадает из игры, но карточки у игроков сохраняются и вернутся, если коллекцию снова показать.</p>
     </div>
     <h2>Обычные карточки: ${commons.length}</h2>
@@ -1084,8 +1260,17 @@ function vSpecs() {
       <tr><th>Название</th><td>до 22 знаков</td></tr>
       <tr><th>Факт</th><td>до 110 знаков, одна-две короткие фразы, проверенные факты</td></tr>
     </table>
+    <h2>Карточка целиком и оборотная сторона</h2>
+    <p>Если вы рисуете карточку полностью (с рамкой, названием и всем оформлением) или оборот, игра показывает картинку как есть, без своих плашек.</p>
+    <table>
+      <tr><th>Пропорции</th><td>11 : 16, вертикальная (как карточка в игре)</td></tr>
+      <tr><th>Размер исходника</th><td>лучше 2200 × 3200 px, минимум 1100 × 1600 px</td></tr>
+      <tr><th>Углы</th><td>игра скругляет углы примерно на 3% ширины, не ставьте важное в самые углы</td></tr>
+      <tr><th>Текст</th><td>на маленькой карточке (около 60 px) мелкий текст не читается: название крупно, остальное для режима «Рассмотреть»</td></tr>
+      <tr><th>Рубашка</th><td>одна на коллекцию, те же 11 : 16; у отдельной карточки может быть свой оборот</td></tr>
+    </table>
     <h2>Что делает кабинет с картинкой</h2>
-    <p>Приводит её к ${ART_W} × ${ART_H} px и сжимает в WebP примерно до 100–200 КБ. Режим «вписать целиком» сохраняет весь рисунок и добавляет прозрачные поля, «заполнить и обрезать» обрезает лишнее по краям. Исходник у вас остаётся как есть: храните его, он пригодится для печати.</p>
+    <p>Иллюстрацию приводит к ${ART_W} × ${ART_H} px, карточку целиком и оборот к ${FULL_W} × ${FULL_H} px, и сжимает в WebP. Режим «вписать целиком» сохраняет весь рисунок и добавляет прозрачные поля, «заполнить и обрезать» обрезает лишнее по краям. Исходник у вас остаётся как есть: храните его, он пригодится для печати.</p>
     <h2>Печать в будущем</h2>
     <p>Для печатных вкладышей понадобится 300 dpi. Карточка 6 × 9 см — это 708 × 1063 px целиком, а иллюстрация на ней около 650 × 455 px. Исходник 2000 × 1400 закрывает это с большим запасом.</p>
   </div>`;
@@ -1151,8 +1336,10 @@ app.addEventListener('click', async e => {
   if (a === 'addcard') { const n = A.cat.cards.filter(c => c.series === sid && c.tier === 'common').length; A.cat.cards.push({ id: sid + '_' + uid(), series: sid, tier: 'common', no: n + 1, name: 'Карточка ' + (n + 1), fact: '', art: null, img: null }); touch(); render(); return; }
   if (a === 'addrare') { A.cat.cards.push({ id: sid + '_r' + uid(), series: sid, tier: 'rare', name: 'Редкая', fact: '', art: null, img: null }); touch(); render(); return; }
   if (a === 'addlim') { A.cat.cards.push({ id: 'lim_' + uid(), series: 'x', tier: 'limited', name: 'Лимитированная', fact: '', art: null, img: null, edition: '№1/100' }); touch(); render(); return; }
-  if (a === 'noimg') { const c = byId(id); setImage(c, null); touch(); render(); return; }
-  if (a === 'delcard') { const c = byId(id); if (!window.confirm(`Удалить карточку «${c.name}»? У игроков она пропадёт из кармана и альбома.`)) return; setImage(c, null); A.cat.cards = A.cat.cards.filter(x => x.id !== id); renumber(c.series); touch(); render(); return; }
+  if (a === 'noimg') { const c = byId(id); setImage(c, null, t.dataset.field || 'img'); touch(); render(); return; }
+  if (a === 'noserback') { const sr = A.cat.series.find(x => x.id === sid); setImage(sr, null, 'back'); touch(); render(); return; }
+  if (a === 'look') { prepCards(); openViewer(id); return; }
+  if (a === 'delcard') { const c = byId(id); if (!window.confirm(`Удалить карточку «${c.name}»? У игроков она пропадёт из кармана и альбома.`)) return; clearAllImages(c); A.cat.cards = A.cat.cards.filter(x => x.id !== id); renumber(c.series); touch(); render(); return; }
   if (a === 'up' || a === 'down') {
     const c = byId(id), list = A.cat.cards.filter(x => x.series === c.series && x.tier === 'common').sort((p, q) => p.no - q.no), i = list.indexOf(c), j = a === 'up' ? i - 1 : i + 1;
     if (j < 0 || j >= list.length) return; const tmp = list[j].no; list[j].no = c.no; c.no = tmp; touch(); render(); return;
@@ -1160,7 +1347,7 @@ app.addEventListener('click', async e => {
   if (a === 'delser') {
     const s = A.cat.series.find(x => x.id === sid);
     if (!window.confirm(`Удалить коллекцию «${s.name}» со всеми карточками? У игроков они пропадут.`)) return;
-    A.cat.cards.filter(c => c.series === sid).forEach(c => setImage(c, null));
+    A.cat.cards.filter(c => c.series === sid).forEach(clearAllImages); setImage(A.cat.series.find(x => x.id === sid), null, 'back');
     A.cat.cards = A.cat.cards.filter(c => c.series !== sid); A.cat.series = A.cat.series.filter(x => x.id !== sid);
     A.tab = A.cat.series[0] ? A.cat.series[0].id : 'specs'; touch(); render(); return;
   }
@@ -1175,13 +1362,29 @@ app.addEventListener('change', async e => {
   const d = e.target.dataset || {};
   if (d.sf && e.target.type === 'checkbox') { const s = A.cat.series.find(x => x.id === d.sid); s[d.sf] = e.target.checked; touch(); render(); return; }
   if (d.sf === 'name') { render(); return; }
+  if (d.mode && d.id) {
+    const c = byId(d.id);
+    if (d.mode === 'front') c.front = e.target.value === 'full' ? 'full' : 'art';
+    if (d.mode === 'back') { if (e.target.value === 'series') { setImage(c, null, 'back'); delete c.backMode; } else c.backMode = 'own'; }
+    touch(); render(); return;
+  }
   if (d.up && e.target.files && e.target.files[0]) {
-    const c = byId(d.up), sel = document.querySelector(`[data-fit="${CSS.escape(d.up)}"]`), fit = sel ? sel.value : 'contain';
+    const c = byId(d.up), kind = d.kind || 'art', field = d.field || 'img';
+    const sel = document.querySelector(`[data-fit="${CSS.escape(d.up)}"]`), fit = kind === 'art' && sel ? sel.value : 'contain';
     try {
-      const r = await processImage(e.target.files[0], c.id, fit);
-      setImage(c, r.path); touch(); render();
+      const r = await processImage(e.target.files[0], c.id, fit, kind, field);
+      setImage(c, r.path, field); touch(); render();
       const w = document.getElementById('warn-' + c.id); if (w && r.warn) w.textContent = r.warn;
     } catch (er) { const w = document.getElementById('warn-' + c.id); if (w) w.textContent = er.message || 'Не удалось прочитать картинку.'; }
+    return;
+  }
+  if (d.upser && e.target.files && e.target.files[0]) {
+    const sr = A.cat.series.find(x => x.id === d.upser);
+    try {
+      const r = await processImage(e.target.files[0], sr.id, 'contain', 'full', 'back');
+      setImage(sr, r.path, 'back'); touch(); render();
+      const w = document.getElementById('warn-ser-' + sr.id); if (w && r.warn) w.textContent = r.warn;
+    } catch (er) { const w = document.getElementById('warn-ser-' + sr.id); if (w) w.textContent = er.message || 'Не удалось прочитать картинку.'; }
   }
 });
 window.addEventListener('beforeunload', e => { if (A.dirty) { e.preventDefault(); e.returnValue = ''; } });

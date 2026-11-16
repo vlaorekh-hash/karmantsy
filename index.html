@@ -371,6 +371,37 @@ body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inse
 .key, .rps-btn { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .opt .tag { flex: none; }
 .mc .art img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.mc.full { padding: 0; overflow: hidden; background: #fff; }
+.mc.full .fullimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+.mc.full .cnt, .mc.full .glued { z-index: 1; }
+.cback { position: absolute; inset: 0; border-radius: 7px; overflow: hidden; display: flex; padding: 9px; box-sizing: border-box; background-color: var(--bc);
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.07) 0 6px, transparent 6px 14px); box-shadow: 0 3px 0 rgba(0,0,0,.3); }
+.cback.img { padding: 0; background: #fff; }
+.cback.img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cb-in { flex: 1; border: 2px dashed #f2a93b; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 10px; color: #f5ecd6; min-width: 0; }
+.cb-logo { font-family: var(--font-display); font-size: 24px; line-height: 1; } .cb-logo span { color: #f2a93b; }
+.cb-pocket { width: 64px; height: auto; }
+.cb-ser { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+.cb-name { font-family: var(--font-display); font-weight: 400; font-size: 15px; line-height: 1.15; }
+.cb-fact { font-size: 11px; line-height: 1.35; opacity: .95; }
+.cb-meta { font-size: 10px; font-weight: 700; opacity: .85; margin-top: 2px; }
+.viewer { position: fixed; inset: 0; z-index: 40; background: rgba(8, 14, 28, .96); color: var(--paper); display: flex; flex-direction: column; align-items: center;
+  padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); gap: 10px; font-family: var(--font-body); -webkit-user-select: none; user-select: none; }
+.vtop { width: 100%; max-width: 520px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 18px; }
+.vstage { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; perspective: 1400px; touch-action: none; cursor: grab; overflow: hidden; }
+.vcard { position: relative; width: 220px; height: 320px; transform-style: preserve-3d; -webkit-transform-style: preserve-3d; will-change: transform; }
+.vcard.snap { transition: transform .45s cubic-bezier(.2, .8, .3, 1); }
+.vface { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.vface .mc { width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.vback { transform: rotateY(180deg); }
+.vshine { position: absolute; inset: 0; border-radius: 7px; pointer-events: none; background: linear-gradient(var(--sa, 120deg), transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%); opacity: var(--so, .2); mix-blend-mode: screen; }
+.vcard.rare .vshine, .vcard.ultra .vshine, .vcard.limited .vshine { background: linear-gradient(var(--sa, 120deg), transparent 25%, rgba(255,236,160,.45) 42%, rgba(190,160,255,.35) 55%, transparent 72%); }
+.vhint { margin: 0; font-size: 13px; opacity: .7; text-align: center; }
+.vbar { display: flex; gap: 10px; width: 100%; max-width: 420px; }
+.vbtn { font: inherit; font-weight: 700; font-size: 16px; color: var(--paper); background: transparent; border: 2px solid var(--paper); border-radius: 10px; padding: 10px 14px; min-height: 44px; min-width: 44px; }
+.vbtn.wide { flex: 1; }
+.vbtn:focus-visible { outline: 3px solid var(--thread); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .vcard.snap { transition: none; } }
 </style>
 <script src="vendor/peerjs.min.js"></script>
 <script src="vendor/qrcode.js"></script>
@@ -379,7 +410,7 @@ body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inse
 <div id="app"></div>
 <script>
 const DEFAULT_CAT = {
- "version": 1,
+ "version": 2,
  "updated": "2026-11-16",
  "ultraNeeds": 3,
  "series": [
@@ -517,7 +548,7 @@ const DEFAULT_CAT = {
    "name": "Мейн-кун",
    "fact": "Один из самых крупных котов. На ушах кисточки, как у рыси.",
    "art": "<ellipse cx=\"100\" cy=\"128\" rx=\"78\" ry=\"7\" fill=\"#14213a\" opacity=\"0.18\"/><path d=\"M140 116 Q178 112 172 84 Q168 74 160 80 Q166 104 136 106Z\" fill=\"#7a5228\"/><path d=\"M64 124 Q60 80 100 74 Q140 80 136 124Z\" fill=\"#a8763e\"/><path d=\"M74 44 L80 14 L98 34Z M126 44 L120 14 L102 34Z\" fill=\"#7a5228\"/><path d=\"M80 14 L78 2 M120 14 L122 2\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><circle cx=\"100\" cy=\"52\" r=\"30\" fill=\"#a8763e\"/><path d=\"M100 22 L100 34 M90 24 L92 34 M110 24 L108 34\" stroke=\"#7a5228\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M70 92 L90 90 M70 104 L92 102 M130 92 L110 90 M130 104 L108 102\" stroke=\"#7a5228\" stroke-width=\"4\" stroke-linecap=\"round\"/><ellipse cx=\"88\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"5\" ry=\"6\" fill=\"#9bc46a\"/><ellipse cx=\"88\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><ellipse cx=\"112\" cy=\"50\" rx=\"1.6\" ry=\"5\" fill=\"#14213a\"/><path d=\"M96 62 L104 62 L100 66Z\" fill=\"#e8838a\"/><path d=\"M100 66 Q96 72 90 70 M100 66 Q104 72 110 70\" stroke=\"#14213a\" stroke-width=\"1.6\" fill=\"none\"/><path d=\"M80 64 L58 60 M80 68 L58 70 M120 64 L142 60 M120 68 L142 70\" stroke=\"#14213a\" stroke-width=\"1\" opacity=\".55\"/><ellipse cx=\"86\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/><ellipse cx=\"114\" cy=\"124\" rx=\"10\" ry=\"5\" fill=\"#a8763e\"/>",
-   "img": null
+   "img": "cards/c1-mwjavfbvop.webp"
   },
   {
    "id": "c2",
@@ -757,7 +788,8 @@ const DEFAULT_CAT = {
    "edition": "№17/100"
   }
  ]
-};
+}
+;
 const COLORS = ['#f26b4e', '#f2c14e', '#6fcf97', '#b58df1', '#5ec4e8'];
 const NAMES = ['Фантик', 'Пуговка', 'Шнурок', 'Крошка', 'Жвачка', 'Скрепка'];
 const ROLES = [
@@ -789,7 +821,8 @@ function applyCat(cat) {
   SER.x = { id: 'x', name: 'Все серии', color: '#b58df1', active: true };
   (cat.cards || []).forEach(c => {
     const sr = SER[c.series]; if (!sr) return;
-    CARDS[c.id] = { id: c.id, s: c.series, ser: c.tier === 'limited' ? 'Выпуск мастера' : sr.name, no: c.no, name: c.name, fact: c.fact || '', art: c.art, img: c.img, tier: c.tier, edition: c.edition, color: sr.color, active: sr.active !== false };
+    CARDS[c.id] = { id: c.id, s: c.series, ser: c.tier === 'limited' ? 'Выпуск мастера' : sr.name, no: c.no, name: c.name, fact: c.fact || '', art: c.art, img: c.img, tier: c.tier, edition: c.edition, color: sr.color, active: sr.active !== false,
+      front: c.front === 'full' && c.full ? 'full' : 'art', full: c.full || null, back: c.back || null, serBack: sr.back || null };
     if (c.tier === 'rare') RARE_OF[c.series] = c.id;
   });
 }
@@ -870,8 +903,27 @@ function mc(id, o) {
     <span class="art">${cardArt(c)}</span>
     <span class="nm">${esc(c.name)}</span>${o.big ? `<span class="fact">${esc(c.fact)}</span>` : ''}
     ${o.count > 1 ? `<span class="cnt">×${o.count}</span>` : ''}${o.glued ? '<span class="glued">в альбоме</span>' : ''}${o.need ? '<span class="glued" style="background:var(--thread)">нужна</span>' : ''}`;
-  const cls = `mc ${c.tier} ${o.big ? 'big' : ''} ${o.sel ? 'sel' : ''} ${o.gone ? 'gone' : ''}`;
-  return o.act ? `<button class="${cls}" data-act="${o.act}" data-id="${id}" ${o.side ? `data-p="${o.side}"` : ''} aria-label="${esc(c.name)}" aria-pressed="${!!o.sel}">${inner}</button>` : `<div class="${cls}">${inner}</div>`;
+  const badges = `${o.count > 1 ? `<span class="cnt">×${o.count}</span>` : ''}${o.glued ? '<span class="glued">в альбоме</span>' : ''}${o.need ? '<span class="glued" style="background:var(--thread)">нужна</span>' : ''}`;
+  const body = c.front === 'full' ? `<img class="fullimg" src="${esc(c.full)}" alt="" loading="lazy" decoding="async">${badges}` : inner;
+  const cls = `mc ${c.tier} ${c.front === 'full' ? 'full' : ''} ${o.big ? 'big' : ''} ${o.sel ? 'sel' : ''} ${o.gone ? 'gone' : ''}`;
+  return o.act ? `<button class="${cls}" data-act="${o.act}" data-id="${id}" ${o.side ? `data-p="${o.side}"` : ''} aria-label="${esc(c.name)}" aria-pressed="${!!o.sel}">${body}</button>` : `<div class="${cls}">${body}</div>`;
+}
+function cardBack(id) {
+  const c = CARDS[id]; if (!c) return '';
+  const img = c.back || c.serBack;
+  if (img) return `<div class="cback img"><img src="${esc(img)}" alt="" decoding="async"></div>`;
+  const tier = ({ common: 'Обычная', rare: 'Редкая', ultra: 'Ультраредкая', limited: 'Лимитированная' })[c.tier];
+  const num = c.tier === 'common' ? `№${c.no} из ${serSize(c.s)}` : c.tier === 'limited' ? (c.edition || '') : '';
+  const col = ({ rare: '#c9971c', ultra: '#7d5bc4', limited: '#14213a' })[c.tier] || c.color;
+  return `<div class="cback" style="--bc:${esc(col)}">
+    <div class="cb-in">
+      <span class="cb-logo">Карман<span>цы</span></span>
+      <svg class="cb-pocket" viewBox="0 0 100 110" aria-hidden="true"><path d="M6 6 H94 V72 L50 104 L6 72Z" fill="rgba(255,255,255,.16)"/><path d="M13 13 H87 V68 L50 95 L13 68Z" fill="none" stroke="#f2a93b" stroke-width="2.5" stroke-dasharray="6 5"/><circle cx="13" cy="13" r="4" fill="#d9824a"/><circle cx="87" cy="13" r="4" fill="#d9824a"/></svg>
+      <span class="cb-ser">${esc(c.ser)}</span>
+      <b class="cb-name">${esc(c.name)}</b>
+      ${c.fact ? `<span class="cb-fact">${esc(c.fact)}</span>` : ''}
+      <span class="cb-meta">${num ? num + ' · ' : ''}${tier}</span>
+    </div></div>`;
 }
 function mathTask(l) {
   let a, b;
@@ -879,7 +931,89 @@ function mathTask(l) {
   if (l === 2) { a = 11 + rnd(49); b = 11 + rnd(29); return Math.random() < .5 ? { text: `${a} + ${b}`, ans: a + b } : { text: `${a + b} − ${b}`, ans: a }; }
   if (l === 3) { a = 2 + rnd(8); b = 2 + rnd(8); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${a}`, ans: b }; }
   a = 12 + rnd(38); b = 3 + rnd(5); return Math.random() < .6 ? { text: `${a} × ${b}`, ans: a * b } : { text: `${a * b} : ${b}`, ans: a };
+}/* ---------- card viewer: full screen, both sides, rotate with a finger ---------- */
+let VWR = null;
+function openViewer(id) {
+  if (!CARDS[id]) return;
+  closeViewer();
+  const c = CARDS[id];
+  const el = document.createElement('div');
+  el.className = 'viewer'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Карточка ' + c.name);
+  el.innerHTML = `<div class="vtop"><b>${esc(c.name)}</b><button class="vbtn" data-v="close" aria-label="Закрыть">✕</button></div>
+    <div class="vstage"><div class="vcard ${c.tier}">
+      <div class="vface vfront">${mc(id, { big: true })}<span class="vshine"></span></div>
+      <div class="vface vback">${cardBack(id)}<span class="vshine"></span></div>
+    </div></div>
+    <p class="vhint">Крути карточку пальцем. Двойной тап или щипок — приблизить.</p>
+    <div class="vbar"><button class="vbtn wide" data-v="flip">Перевернуть</button><button class="vbtn wide" data-v="zoom">Крупнее</button></div>`;
+  document.body.appendChild(el);
+  document.body.style.overflow = 'hidden';
+  const card = el.querySelector('.vcard'), stage = el.querySelector('.vstage');
+  const V = VWR = { el, card, ry: -25, rx: 8, zoom: 1, fit: 1, pts: new Map(), last: null, vel: 0, tapAt: 0, pinch: null, moved: 0 };
+  const fit = () => { V.fit = Math.max(.6, Math.min((window.innerWidth - 40) / 220, (window.innerHeight - 220) / 320, 2.4)); };
+  const draw = () => {
+    card.style.transform = `scale(${(V.fit * V.zoom).toFixed(3)}) rotateX(${V.rx.toFixed(1)}deg) rotateY(${V.ry.toFixed(1)}deg)`;
+    const a = ((V.ry % 360) + 360) % 360;
+    el.style.setProperty('--sa', (100 + a * .6).toFixed(0) + 'deg');
+    el.style.setProperty('--so', (Math.abs(Math.sin(V.ry * Math.PI / 180)) * .7 + .1).toFixed(2));
+    el.querySelector('[data-v=zoom]').textContent = V.zoom > 1.05 ? 'Мельче' : 'Крупнее';
+  };
+  const snap = (extra) => {
+    card.classList.add('snap');
+    V.ry = Math.round((V.ry + (extra || 0)) / 180) * 180; V.rx = 0; draw();
+    clearTimeout(V.st); V.st = setTimeout(() => card.classList.remove('snap'), 480);
+  };
+  const setZoom = z => { V.zoom = Math.max(1, Math.min(2.6, z)); card.classList.add('snap'); draw(); clearTimeout(V.st); V.st = setTimeout(() => card.classList.remove('snap'), 480); };
+  fit(); draw(); requestAnimationFrame(() => snap());
+  V.onResize = () => { fit(); draw(); };
+  window.addEventListener('resize', V.onResize);
+  V.onKey = e => { if (e.key === 'Escape') closeViewer(); if (e.key === 'ArrowLeft') snap(-180); if (e.key === 'ArrowRight') snap(180); };
+  document.addEventListener('keydown', V.onKey);
+  el.addEventListener('click', e => {
+    const b = e.target.closest('[data-v]'); if (!b) { if (e.target === el) closeViewer(); return; }
+    if (b.dataset.v === 'close') closeViewer();
+    if (b.dataset.v === 'flip') snap(180);
+    if (b.dataset.v === 'zoom') setZoom(V.zoom > 1.05 ? 1 : 1.8);
+  });
+  stage.addEventListener('pointerdown', e => {
+    e.preventDefault(); stage.setPointerCapture && stage.setPointerCapture(e.pointerId);
+    V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    card.classList.remove('snap');
+    if (V.pts.size === 2) { const [p, q] = [...V.pts.values()]; V.pinch = { d: Math.hypot(p.x - q.x, p.y - q.y), z: V.zoom }; }
+    else { V.last = { x: e.clientX, y: e.clientY, t: performance.now() }; V.vel = 0; V.moved = 0; }
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!V.pts.has(e.pointerId)) return;
+    V.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (V.pts.size >= 2 && V.pinch) { const [p, q] = [...V.pts.values()]; V.zoom = Math.max(1, Math.min(2.6, V.pinch.z * Math.hypot(p.x - q.x, p.y - q.y) / (V.pinch.d || 1))); draw(); return; }
+    if (!V.last) return;
+    const now = performance.now(), dx = e.clientX - V.last.x, dy = e.clientY - V.last.y;
+    V.ry += dx * .55; V.rx = Math.max(-35, Math.min(35, V.rx - dy * .35));
+    V.vel = dx * .55 / Math.max(8, now - V.last.t);
+    V.moved += Math.abs(dx) + Math.abs(dy);
+    V.last = { x: e.clientX, y: e.clientY, t: now }; draw();
+  });
+  const up = e => {
+    if (!V.pts.has(e.pointerId)) return;
+    V.pts.delete(e.pointerId);
+    if (V.pts.size === 1) { const p = [...V.pts.values()][0]; V.last = { x: p.x, y: p.y, t: performance.now() }; V.pinch = null; return; }
+    if (V.pts.size) return;
+    V.pinch = null;
+    const now = performance.now();
+    if (V.moved < 8) { if (now - V.tapAt < 320) { setZoom(V.zoom > 1.05 ? 1 : 1.8); V.tapAt = 0; return; } V.tapAt = now; }
+    snap(Math.max(-180, Math.min(180, V.vel * 220)));
+    V.last = null;
+  };
+  stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+  stage.addEventListener('wheel', e => { e.preventDefault(); setZoom(V.zoom * (e.deltaY < 0 ? 1.12 : .89)); }, { passive: false });
+  el.querySelector('[data-v=flip]').focus();
 }
+function closeViewer() {
+  if (!VWR) return;
+  window.removeEventListener('resize', VWR.onResize); document.removeEventListener('keydown', VWR.onKey);
+  VWR.el.remove(); VWR = null; document.body.style.overflow = '';
+}
+
 /* ================= Карманцы: два телефона =================
    Each phone keeps its own profile (heroes, voices, collection) in localStorage.
    Phones connect peer-to-peer (PeerJS / WebRTC). The host phone is the referee:
@@ -1070,10 +1204,11 @@ function onGame() {
   if (!fresh) { render(); return; }
   const prevPhase = lastSeen.id === G.id && lastSeen.role === G.role ? lastSeen.phase : '';
   lastSeen = { id: G.id, round: G.round, phase: G.phase, role: G.role };
+  if (G.phase === 'intro') closeViewer();
   if (G.phase === 'stakes') { U.screen = 'stakes'; }
   else if (G.phase === 'declined') { const by = G.by; G = null; U.screen = 'lobby'; U.toast = by === me() ? 'Ты отказался от ставок.' : 'Соперник отказался от ставок.'; LOB.ready = false; send({ t: 'lob', l: LOB }); render(); return; }
   else if (G.phase === 'intro') { U.screen = 'intro'; U.ready = false; }
-  else if (G.phase === 'play') { U.screen = 'duel'; U.input = ''; U.sent = false; U.myPick = null; startCount(); }
+  else if (G.phase === 'play') { closeViewer(); U.screen = 'duel'; U.input = ''; U.sent = false; U.myPick = null; startCount(); }
   else if (G.phase === 'res') { U.screen = 'duel'; clearTimeout(CT); stopSpeech(); U.count = 0; if (G.role === 'war' && G.res.why !== 'time') { U.shake = true; setTimeout(() => { U.shake = false; render(); }, 1200); } }
   else if (G.phase === 'end') { settle(); U.screen = 'result'; stopSpeech(); }
   render();
@@ -1333,9 +1468,10 @@ function vStakes() {
     <p class="muted">${OPTS.find(x => x.id === G.mode).name}. Победитель забирает ставку соперника.</p>
     <div class="patch stack">
       <div class="big-cards">
-        <div>${mc(mine, { big: true })}<b>Твоя ставка</b><span class="muted">${esc(P.name)}</span></div>
-        <div>${mc(theirs, { big: true })}<b>Ставка соперника</b><span class="muted">${oppName()}</span></div>
+        <div>${mc(mine, { big: true, act: 'view' })}<b>Твоя ставка</b><span class="muted">${esc(P.name)}</span></div>
+        <div>${mc(theirs, { big: true, act: 'view' })}<b>Ставка соперника</b><span class="muted">${oppName()}</span></div>
       </div>
+      <p class="note">Нажми на карточку, чтобы рассмотреть её со всех сторон.</p>
       <p style="text-align:center">${need ? '<b class="thread">Такой карточки у тебя ещё нет!</b> Выиграй её для альбома.' : 'Такая карточка у тебя уже есть: это будет повторка.'}</p>
     </div>
     <button class="btn" data-act="accept" ${acc ? 'disabled' : ''}>${acc ? 'Ждём соперника…' : 'Принимаю, в бой!'}</button>
@@ -1400,7 +1536,7 @@ function vResult() {
   if (G.stake) {
     const card = won ? G.stake[them()] : G.stake[me()];
     stake = `<div class="patch stack"><h2>${won ? 'Ты забираешь карточку' : 'Карточка ушла к сопернику'}</h2>
-      <div class="big-cards"><div>${mc(card, { big: true, gone: !won })}<span class="muted">${won ? 'выиграна у: ' + oppName() : 'теперь у: ' + oppName()}</span></div></div>
+      <div class="big-cards"><div>${mc(card, { big: true, gone: !won, act: 'view' })}<span class="muted">${won ? 'выиграна у: ' + oppName() : 'теперь у: ' + oppName()}</span></div></div>
       <p class="muted">${won ? (isGlued(card) ? 'Такая уже вклеена, это повторка.' : 'Такой в альбоме ещё нет! Загляни в альбом и вклей.') : 'Отыграй её в реванше.'}</p></div>`;
   }
   return `<h1>${won ? 'Победа!' : 'Поражение'}</h1>
@@ -1416,22 +1552,23 @@ function vAlbum() {
   if (sel) {
     const c = CARDS[sel], glued = isGlued(sel);
     const hint = c.tier === 'limited' ? 'Лимитированную не вклеивают.' : glued ? 'Такая уже вклеена. Это повторка: ставь её на кон.' : 'Вклеенная карточка уходит из кармана навсегда: на кон её поставить уже нельзя.';
-    bar = `<div class="bar"><b>${c.name}</b><span class="muted">${hint}</span>${!glued && c.tier !== 'limited' ? '<button class="btn" data-act="glue">Вклеить в альбом</button>' : ''}</div>`;
+    bar = `<div class="bar"><b>${esc(c.name)}</b><span class="muted">${hint}</span>
+      <div class="row" style="gap:8px"><button class="btn ghost" data-act="view" data-id="${sel}" style="flex:1">Рассмотреть</button>${!glued && c.tier !== 'limited' ? '<button class="btn" data-act="glue" style="flex:1">Вклеить</button>' : ''}</div></div>`;
   }
   const row = s => { const got = A[s] || [], list = (CAT.cards || []).filter(c => c.series === s && c.tier === 'common').sort((a, b) => a.no - b.no);
     return `<div class="stack" style="gap:6px"><div class="serhead"><span>${esc(SERIES[s])}</span><span class="muted">${got.length} из ${serSize(s)}</span></div>
-    <div class="grid5">${list.map(c => got.includes(c.id) ? mc(c.id) : `<div class="slot-empty">${c.no}</div>`).join('')}</div></div>`; };
+    <div class="grid5">${list.map(c => got.includes(c.id) ? mc(c.id, { act: 'view' }) : `<div class="slot-empty">${c.no}</div>`).join('')}</div></div>`; };
   return `<h1>Карман и альбом</h1>
     ${U.toast ? `<div class="toast">${U.toast}</div>` : ''}
     <div class="patch stack">
       <div class="row between"><h2>В кармане: ${P.col.pocket.length}</h2><button class="chip" style="flex:none;padding:8px 12px;border-color:var(--thread)" data-act="gum">3 случайные</button></div>
-      <p class="muted">Нажми на карточку, чтобы вклеить. Повторки оставляй для ставок.</p>
+      <p class="muted">Нажми на карточку, чтобы рассмотреть или вклеить. Вклеенные в альбом тоже можно открыть.</p>
       ${g.length ? `<div class="grid4">${g.map(x => mc(x.id, { count: x.n, act: 'sel', sel: sel === x.id, glued: isGlued(x.id) })).join('')}</div>` : '<p>Карман пуст.</p>'}
     </div>
     <div class="patch stack"><h2>Альбом</h2>${SER_LIST.map(x => row(x.id)).join('')}
       <div class="stack" style="gap:6px"><div class="serhead"><span>Редкие и выше</span><span class="muted">${A.rare.length} из ${CAT.ultraNeeds || 3}</span></div>
-        <div class="grid5">${SER_LIST.filter(x => RARE_OF[x.id]).map(x => A.rare.includes(RARE_OF[x.id]) ? mc(RARE_OF[x.id]) : `<div class="slot-empty small">Собери серию «${esc(x.name)}»</div>`).join('')}
-          ${CARDS.ux ? (A.ultra ? mc('ux') : `<div class="slot-empty small">${CAT.ultraNeeds || 3} редкие</div>`) : ''}<div class="slot-empty small">От мастера игры</div></div></div></div>
+        <div class="grid5">${SER_LIST.filter(x => RARE_OF[x.id]).map(x => A.rare.includes(RARE_OF[x.id]) ? mc(RARE_OF[x.id], { act: 'view' }) : `<div class="slot-empty small">Собери серию «${esc(x.name)}»</div>`).join('')}
+          ${CARDS.ux ? (A.ultra ? mc('ux', { act: 'view' }) : `<div class="slot-empty small">${CAT.ultraNeeds || 3} редкие</div>`) : ''}<div class="slot-empty small">От мастера игры</div></div></div></div>
     ${bar}
     <button class="btn ghost" data-act="back">Назад</button>
     <button class="linkbtn" data-act="colreset">Начать коллекцию заново</button>`;
@@ -1497,6 +1634,7 @@ function act(t) {
     case 'cancel': send({ t: 'leave' }); closeNet(); G = null; BANNER = null; stopSpeech(); U.screen = 'home'; U.err = ''; history.replaceState(null, '', location.pathname + location.search); break;
     case 'album': U.back = U.screen; U.sel = null; U.toast = ''; U.screen = 'album'; break;
     case 'back': U.screen = U.back === 'result' && G ? 'result' : U.back === 'lobby' && conn ? 'lobby' : 'home'; U.toast = ''; if (LOB && LOB.stake && !P.col.pocket.includes(LOB.stake)) { LOB.stake = null; LOB.ready = false; pushLob(); } break;
+    case 'view': openViewer(t.dataset.id); return;
     case 'sel': U.sel = U.sel === t.dataset.id ? null : t.dataset.id; U.toast = ''; break;
     case 'glue': if (U.sel) glue(U.sel); break;
     case 'gum': { const got = [pick(commons()), pick(commons()), pick(commons())]; P.col.pocket.push(...got); U.toast = 'Получено: ' + got.map(id => '«' + CARDS[id].name + '»').join(', ') + '.'; U.sel = null; saveP(); if (conn) send({ t: 'prof', p: summary() }); break; }
